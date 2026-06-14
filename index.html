@@ -9,56 +9,55 @@
 <script src="vendor/leaflet.js"></script>
 <style>
   :root{
-    --bg:#0f1419; --card:#1a2230; --card2:#222c3c; --line:#2c3a4f;
-    --txt:#e8edf4; --mut:#94a3b8; --acc:#ffb454; --acc2:#7dd3fc; --green:#7ee787;
+    --bg:#F7F1E5; --card:#FFFFFF; --card2:#FCF8F0; --line:#E5DCC9;
+    --txt:#211D16; --mut:#6B6354; --acc:#9A6A28; --acc2:#6E4A19; --green:#3E7D55;
+    --serif:"Source Serif 4",Georgia,serif;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);
-    font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
-  header{padding:22px 18px 14px;border-bottom:1px solid var(--line);
-    background:linear-gradient(180deg,#16202e,#0f1419)}
-  h1{margin:0 0 4px;font-size:22px}
+    font-family:"Manrope",-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+  header{padding:22px 18px 14px;border-bottom:1px solid var(--line);background:var(--card2)}
+  h1{margin:0 0 4px;font-size:24px;font-family:var(--serif);font-weight:600;letter-spacing:-.01em}
   .sub{color:var(--mut);font-size:13px}
   .wrap{max-width:1100px;margin:0 auto;padding:16px 18px 60px}
-  .filters{position:sticky;top:0;z-index:600;background:#0f1419ee;backdrop-filter:blur(6px);
+  .filters{position:sticky;top:0;z-index:600;background:rgba(247,241,229,.92);backdrop-filter:blur(6px);
     padding:12px 0;border-bottom:1px solid var(--line);margin-bottom:14px}
   .frow{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:8px}
   .flabel{color:var(--mut);font-size:12px;width:100%;margin:2px 0 -2px;text-transform:uppercase;letter-spacing:.04em}
   .pill{border:1px solid var(--line);background:var(--card);color:var(--txt);
     padding:6px 12px;border-radius:999px;cursor:pointer;font-size:13px;user-select:none;transition:.12s}
   .pill:hover{border-color:var(--acc2)}
-  .pill.on{background:var(--acc);color:#1a1407;border-color:var(--acc);font-weight:600}
-  .pill.person.on{background:var(--acc2);color:#06283a;border-color:var(--acc2)}
-  .pill.age.on,.pill.month.on{background:var(--green);color:#06283a;border-color:var(--green)}
+  .pill.on{background:var(--acc);color:#FCF8F0;border-color:var(--acc);font-weight:600}
+  .pill.person.on{background:var(--acc2);color:#FCF8F0;border-color:var(--acc2)}
+  .pill.age.on,.pill.month.on{background:var(--green);color:#FCF8F0;border-color:var(--green)}
   #search{flex:1;min-width:160px;background:var(--card);border:1px solid var(--line);
     color:var(--txt);padding:8px 12px;border-radius:8px;font-size:14px}
   .count{color:var(--mut);font-size:13px;margin:4px 0 12px}
   .viewtoggle{display:flex;gap:6px;margin-left:auto}
-  .month-h{font-size:15px;color:var(--acc);margin:22px 0 8px;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .month-h{font-size:16px;color:var(--acc);margin:22px 0 8px;border-bottom:1px dashed var(--line);padding-bottom:4px;font-family:var(--serif);font-weight:600}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;
     display:flex;flex-direction:column;gap:7px}
-  .card h3{margin:0;font-size:16px}
+  .card h3{margin:0;font-size:17px;font-family:var(--serif);font-weight:600}
   .en{color:var(--mut);font-size:12px;font-style:italic}
   .meta{font-size:13px;color:var(--txt)}
   .meta b{color:var(--mut);font-weight:500}
-  .desc{font-size:13px;color:#c6d2e0}
+  .desc{font-size:13px;color:#6B6354}
   .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
   .tag{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--card2);color:var(--acc2);border:1px solid var(--line)}
-  .tag.who{color:#fff;background:#2b3a4d}
+  .tag.who{color:#6E4A19;background:#EEE2C9}
   .conf{font-size:11px;padding:2px 7px;border-radius:6px}
-  .conf.high{background:#16331f;color:var(--green)} .conf.medium{background:#332a16;color:var(--acc)}
-  .conf.low{background:#331616;color:#ff9a9a}
+  .conf.high{background:#E4EFE6;color:#3E7D55} .conf.medium{background:#F3E8CE;color:#B07A1E}
+  .conf.low{background:#F3E1D9;color:#B0472F}
   .btns{display:flex;gap:8px;margin-top:auto;flex-wrap:wrap}
-  a.btn{display:inline-block;text-decoration:none;color:#06283a;background:var(--acc2);
-    padding:7px 12px;border-radius:8px;font-size:13px;font-weight:600;text-align:center;flex:1}
-  a.btn.map{background:var(--green)}
+  a.btn{display:inline-block;text-decoration:none;color:#FCF8F0;background:var(--acc);padding:7px 12px;border-radius:8px;font-size:13px;font-weight:600;text-align:center;flex:1}
+  a.btn.map{background:transparent;color:var(--mut);border:1px solid var(--line)}
   a.btn:hover{filter:brightness(1.08)}
   .when{font-size:13px;color:var(--acc);font-weight:600}
   .free{color:var(--green);font-weight:600}
   #map{height:70vh;min-height:420px;border-radius:12px;border:1px solid var(--line);display:none}
   .leaflet-popup-content{font-size:13px;line-height:1.4}
-  .leaflet-popup-content a{color:#0a66c2}
+  .leaflet-popup-content a{color:#6E4A19}
   footer{color:var(--mut);font-size:12px;text-align:center;padding:24px}
 </style>
 <meta name="description" content="Афиша Еревана: 209 событий — концерты, фестивали, детские программы, традиции. Фильтры по аудитории, возрасту, месяцу и теме; список и карта.">
@@ -77,9 +76,9 @@
     <div class="sub">2026-05-28 → 2026-12-31 · Ереван · обновлено 2026-06-11 · всего событий: 209</div>
     <div style="margin:10px 0 14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
       <a href="guides/index.html" style="background:#9A6A28;color:#FCF8F0;font-weight:700;font-size:13px;padding:7px 13px;border-radius:8px;text-decoration:none">Гайды по Еревану</a>
-      <a href="guides/pereezd-v-erevan-rus.html" style="border:1px solid rgba(255,255,255,.28);color:#e8edf4;font-size:13px;padding:7px 13px;border-radius:8px;text-decoration:none">Переезд в Ереван</a>
-      <a href="guides/chto-delat-v-erevane.html" style="border:1px solid rgba(255,255,255,.28);color:#e8edf4;font-size:13px;padding:7px 13px;border-radius:8px;text-decoration:none">Что делать в городе</a>
-      <a href="https://t.me/yerevan_afisha_bot" style="border:1px solid rgba(255,255,255,.28);color:#e8edf4;font-size:13px;padding:7px 13px;border-radius:8px;text-decoration:none">Открыть в Telegram</a>
+      <a href="guides/pereezd-v-erevan-rus.html" style="border:1px solid #D8CDB6;color:#6B6354;font-size:13px;padding:7px 13px;border-radius:8px;text-decoration:none">Переезд в Ереван</a>
+      <a href="guides/chto-delat-v-erevane.html" style="border:1px solid #D8CDB6;color:#6B6354;font-size:13px;padding:7px 13px;border-radius:8px;text-decoration:none">Что делать в городе</a>
+      <a href="https://t.me/yerevan_afisha_bot" style="border:1px solid #D8CDB6;color:#6B6354;font-size:13px;padding:7px 13px;border-radius:8px;text-decoration:none">Открыть в Telegram</a>
     </div>
   </div>
 </header>
