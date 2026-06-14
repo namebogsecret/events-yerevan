@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# AI-краулеры явно приветствуются
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://events.podlevskikh.com/sitemap.xml
