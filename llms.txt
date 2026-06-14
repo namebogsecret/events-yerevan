@@ -6,6 +6,11 @@
 
 ## Разделы
 - Главная: https://events.podlevskikh.com/ — все события с фильтрами и картой
+- Гайды по Еревану: https://events.podlevskikh.com/guides/ — вечнозелёные материалы для жизни и переезда
+  - Что делать в Ереване: https://events.podlevskikh.com/guides/chto-delat-v-erevane.html
+  - Переезд в Ереван для русскоязычных: https://events.podlevskikh.com/guides/pereezd-v-erevan-rus.html
+  - Жильё и районы Еревана: https://events.podlevskikh.com/guides/zhilyo-i-rayony-erevana.html
+  - Школы и дети в Ереване: https://events.podlevskikh.com/guides/shkoly-i-deti-v-erevane.html
 
 ## Связанные проекты
 - Репетитор физики и математики (IB/AP/SAT, МГУ): https://tutor.podlevskikh.com
