@@ -29,10 +29,18 @@
   .pop{font-size:12px;line-height:1.5}
   .pop a{color:#1a5cff}
   .foot{font-size:10px;color:#6b7da0;margin-top:8px;line-height:1.4}
+  #wrap{position:relative}
+  #side{transition:width .25s ease, padding .25s ease, opacity .2s ease}
+  #wrap.collapsed #side{width:0;min-width:0;padding-left:0;padding-right:0;opacity:0;overflow:hidden}
+  #sidetoggle{position:absolute;top:10px;left:348px;z-index:1500;background:#0f1729;color:#e8edf6;border:1px solid #2e3f63;border-radius:8px;padding:6px 10px;cursor:pointer;font:600 13px system-ui;box-shadow:0 2px 6px rgba(0,0,0,.45);transition:left .25s ease;user-select:none}
+  #sidetoggle:hover{background:#1b2747}
+  #wrap.collapsed #sidetoggle{left:8px}
+  @media(max-width:600px){#sidetoggle{left:auto;right:10px}#wrap.collapsed #sidetoggle{left:8px;right:auto}}
 </style>
 </head>
 <body>
 <div id="wrap">
+  <button id="sidetoggle" onclick="toggleSide()">⟨ Скрыть</button>
   <div id="side">
     <div style="margin:-4px 0 12px;font-size:12px"><a href="./" style="color:#7ea2ff;text-decoration:none">← События в Ереване</a> · <a href="https://podlevskikh.com" style="color:#6b7da0;text-decoration:none">podlevskikh.com</a></div>
     <h1>Новые детские площадки Еревана</h1>
@@ -202,6 +210,12 @@ const arabkir = [
 ];
 
 const map = L.map('map').setView([40.178,44.512], 13);
+function toggleSide(){
+  const w=document.getElementById('wrap'), b=document.getElementById('sidetoggle');
+  const collapsed=w.classList.toggle('collapsed');
+  b.textContent=collapsed?'☰ Меню':'⟨ Скрыть';
+  setTimeout(()=>map.invalidateSize(),280);
+}
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   maxZoom:19, attribution:'© OpenStreetMap'
 }).addTo(map);
