@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Детские площадки Еревана 2026 — карта новых и больших · события в Ереване</title>
+<meta name="description" content="Интерактивная карта детских площадок Еревана: новые тематические (Керон), 344 точки OSM с раскраской по возрасту, топ большие и прикольные, детская ж/д в Разданском ущелье.">
+<link rel="canonical" href="https://events.podlevskikh.com/detskie-ploshchadki.html">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<script src="osm_points.js"></script>
+<style>
+  html,body{margin:0;height:100%;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  #wrap{display:flex;height:100%}
+  #side{width:340px;max-width:42vw;overflow:auto;background:#0f1729;color:#e8edf6;padding:16px 18px;box-sizing:border-box}
+  #map{flex:1}
+  h1{font-size:18px;margin:0 0 4px}
+  .sub{font-size:12px;color:#9fb0cc;margin:0 0 14px;line-height:1.4}
+  .card{background:#16213c;border:1px solid #243456;border-radius:10px;padding:10px 12px;margin:0 0 10px;cursor:pointer;transition:.15s}
+  .card:hover{border-color:#4f7cff;background:#1b2747}
+  .card h3{margin:0 0 4px;font-size:14px}
+  .badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;margin-left:6px;vertical-align:middle}
+  .open{background:#103d24;color:#5ee08a}
+  .plan{background:#3d2f10;color:#f0c65e}
+  .meta{font-size:11px;color:#9fb0cc;line-height:1.5;margin:4px 0 0}
+  .meta b{color:#cdd9ef}
+  .lk a{color:#7ea2ff;font-size:11px;text-decoration:none;margin-right:10px}
+  .lk a:hover{text-decoration:underline}
+  .pop b{font-size:13px}
+  .pop{font-size:12px;line-height:1.5}
+  .pop a{color:#1a5cff}
+  .foot{font-size:10px;color:#6b7da0;margin-top:8px;line-height:1.4}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="side">
+    <div style="margin:-4px 0 12px;font-size:12px"><a href="./" style="color:#7ea2ff;text-decoration:none">← События в Ереване</a> · <a href="https://podlevskikh.com" style="color:#6b7da0;text-decoration:none">podlevskikh.com</a></div>
+    <h1>Новые детские площадки Еревана</h1>
+    <p class="sub">Тематические (Керон) + дворовые/мини-поля по районам, 2024–2026. Кликните карточку — карта подлетит к метке.<br><b>⭐ звёзды</b> на карте = самые большие и прикольные (топ-выбор).</p>
+    <div style="background:#16213c;border:1px solid #2e86de;border-radius:10px;padding:8px 10px;margin:0 0 14px">
+      <div style="font-size:12px;color:#cdd9ef;margin-bottom:5px">На карте <b>344 точки</b> площадок (OSM/Overpass, точные координаты), <b>раскрашены по возрасту</b>: <span style="color:#39d353">●</span> ярко-зелёные = новые (за последние 4 года), <span style="color:#aebfc4">●</span> бледные = старые. Тумблер справа вверху. 🚂 Красная линия — детская ж/д в ущелье.<br><i style="color:#9fb0cc">«Новизна» = дата появления/правки на карте OSM (прокси, не точная дата постройки).</i><br>Доп. живые карты:</div>
+      <div class="lk">
+        <a href="https://2gis.am/armenia/search/%D5%84%D5%A1%D5%B6%D5%AF%D5%A1%D5%AF%D5%A1%D5%B6%20%D5%AD%D5%A1%D5%B2%D5%A1%D5%B0%D6%80%D5%A1%D5%BA%D5%A1%D6%80%D5%A1%D5%AF%D5%B6%D5%A5%D6%80/rubricId/112884" target="_blank">2ГИС: площадки</a>
+        <a href="https://yandex.ru/maps/10262/yerevan/search/детская%20площадка/" target="_blank">Яндекс</a>
+        <a href="https://www.google.com/maps/search/playground+Yerevan" target="_blank">Google</a>
+      </div>
+    </div>
+    <div id="list"></div>
+    <h2 style="font-size:14px;margin:18px 0 6px;color:#f0c65e">🏠 Дворовые и прочие новые (по районам)</h2>
+    <p class="sub" style="margin-bottom:10px">Малые дворовые площадки + мини-поля + новые парки от мэрии (Шенгавит, Эребуни, Аван…). Выборка задокументированных в прессе; всего по городу за 2024 г. благоустроено ~309 дворов — точных координат по каждому нет, см. кнопки «живых карт» выше.</p>
+    <div id="yards"></div>
+    <h2 style="font-size:14px;margin:18px 0 6px;color:#74b9ff">🟦 Арабкир / коридор Барекамутюн → центр</h2>
+    <p class="sub" style="margin-bottom:10px">Прямо у Барекамутюна большой тематической нет — они все в центре (вниз по Баграмяна). Здесь: новые локальные в Арабкире + хорошие существующие парки в коридоре.</p>
+    <div id="arabkir"></div>
+    <p class="foot"><b>Точность:</b> 🟢 344 OSM-точки и 🚂 ж/д — точные координаты. Кураторские метки (тематические/дворовые/Арабкир): №3 Изобретатели — точная (Wikidata); большие №1–2 и дворовые — привязка к парку/дому (±50–200 м), уточняйте кнопкой «Google Maps». Источник OSM-слоя: Overpass API (leisure=playground), bbox Еревана.</p>
+  </div>
+  <div id="map"></div>
+</div>
+<script src="vendor/leaflet.js"></script>
+<script>
+const sites = [
+  {
+    n:"1. «Кармрахайт» (Красная форель)",
+    theme:"Тайны скрытой реки — водный мир: 8-метровая форель + 27 м сеток-волн",
+    park:"Кольцевой (Оғакадзев) парк, 6-й сектор",
+    addr:"Рядом с собором Григория Просветителя, у метро «Зоравар Андраник», Кентрон",
+    size:"≈2000 м² — крупнейшая бесплатная в Ереване",
+    age:"0–12 лет",
+    date:"21 сентября 2025",
+    status:"open",
+    lat:40.17225, lng:44.51540,
+    site:"https://keronfoundation.am/yerevan-welcomes-its-largest-public-playground/"
+  },
+  {
+    n:"2. «Вишапагорг» (Дракон-ковёр)",
+    theme:"Память древа жизни — узор армянского ковра, дракон-вишап, тотем-страж",
+    park:"Сквер Хачкаров (у парка 2800-летия)",
+    addr:"Рядом с площадью Республики, ул. Италии / Бейрута, Кентрон",
+    size:"≈800–880 м²",
+    age:"0–7 лет",
+    date:"14 декабря 2025",
+    status:"open",
+    lat:40.17545, lng:44.50790,
+    site:"https://keronfoundation.am/yerevan-welcomed-another-new-free-public-playground-ahead-of-the-new-year/"
+  },
+  {
+    n:"3. «Армянские изобретатели: наука изнутри»",
+    theme:"Первая вертикальная площадка: башня 6 м, горка 7 м, физика/астрономия/инженерия",
+    park:"Сквер имени Мисака Манушяна",
+    addr:"≈570 м от площади Республики, у Машатоц/Амирян, Кентрон",
+    size:"≈700 м²",
+    age:"3–12 лет",
+    date:"4 мая 2026",
+    status:"open",
+    lat:40.18336, lng:44.50752,
+    site:"https://keronfoundation.am/armenian-inventors-science-inside-out-official-opening-ceremony-of-a-new-public-playground/"
+  },
+  {
+    n:"4. «Безоарский козёл» (в стройке)",
+    theme:"Природа и редкие животные Армении — уникальная тематическая",
+    park:"Парк «Возрождения» (Вераценунд)",
+    addr:"Район Нор-Норк",
+    size:">1500 м²",
+    age:"—",
+    date:"Анонс 11 июня 2026 — строится",
+    status:"plan",
+    lat:40.1965, lng:44.5460,
+    site:"https://radar.am/hy/news/yerevan-2762374214/"
+  }
+];
+
+// Дворовые площадки (Шенгавит и др.), последние 2-3 года. Координаты приблизительные (по адресу дома).
+const yards = [
+  {
+    n:"Гарегин Нжде 56А",
+    desc:"Двор: новое футбольное/игровое поле, открыто с матчем при участии мэра",
+    addr:"ул. Гарегин Нжде 56А, Шенгавит",
+    date:"июнь 2026",
+    lat:40.1500, lng:44.4865,
+    site:"https://www.yerevan.am/hy/news/shengavit-owm-fowtboli-nor-khaghadashti-bats-owme-nshanavorvets-fowtbolayin-khaghov/"
+  },
+  {
+    n:"Аэрация, кв-л 5/1",
+    desc:"Дворовая площадка с игровыми аттракционами (визит главы Шенгавита)",
+    addr:"квартал Аэрация 5/1, Шенгавит",
+    date:"~2024–2025",
+    lat:40.1370, lng:44.4760,
+    site:"https://blognews.am/arm/news/27843/erku-nor-khaxahraparak-ev-mek-mini-futboli-dasht-shengavitum-fotosharq.html"
+  },
+  {
+    n:"Араратская ул. (двор)",
+    desc:"Дворовая игровая площадка с аттракционами",
+    addr:"ул. Араратская, Шенгавит",
+    date:"~2024–2025",
+    lat:40.1430, lng:44.4920,
+    site:"https://blognews.am/arm/news/27843/erku-nor-khaxahraparak-ev-mek-mini-futboli-dasht-shengavitum-fotosharq.html"
+  },
+  {
+    n:"Шарури 25, 27, 29",
+    desc:"Дворовое мини-футбольное поле",
+    addr:"ул. Шарури 25/27/29, Шенгавит",
+    date:"~2024–2025",
+    lat:40.1455, lng:44.4830,
+    site:"https://blognews.am/arm/news/27843/erku-nor-khaxahraparak-ev-mek-mini-futboli-dasht-shengavitum-fotosharq.html"
+  },
+  {
+    n:"Аршакуняц 50/3",
+    desc:"Дворовая площадка, построена мэрией/райадминистрацией (по соседству жалобы на сточные воды — см. источник)",
+    addr:"просп. Аршакуняц 50/3, Эребуни",
+    date:"2026",
+    lat:40.1565, lng:44.5025,
+    site:"https://shamshyan.com/hy/article/2026/02/18/1300155"
+  },
+  {
+    n:"«Парк жизни» (Ботанический сад)",
+    desc:"Огромный новый парк ~50 га: променад, велодорожки 3.5 км, искусств. озеро, 16000 деревьев. В стройке (5 млрд драм)",
+    addr:"Ботанический сад, ул. Царав Ахбюр, Аван/Нор-Норк",
+    date:"строится (июнь 2026)",
+    lat:40.2130, lng:44.5460,
+    site:"https://armenpress.am/en/article/1253604"
+  }
+];
+
+// Арабкир / коридор Барекамутюн → центр
+const arabkir = [
+  {
+    n:"Арам Хачатрян – Мамиконянц (двор)",
+    desc:"НОВАЯ зона отдыха + детская площадка для жильцов домов вдоль соединительной дороги",
+    addr:"между ул. Арам Хачатрян и Мамиконянц, Арабкир (≈700 м от пл. Барекамутюн)",
+    date:"2024",
+    kind:"new",
+    lat:40.1935, lng:44.5005,
+    site:"https://shamshyan.com/hy/article/2024/05/18/1261828"
+  },
+  {
+    n:"Парк Комитаса (пурак)",
+    desc:"Реконструкция (подарок банка ACBA к 30-летию): современная зона отдыха + детский уголок. Идёт/планируется",
+    addr:"пурак Комитаса у Консерватории, Арабкир/Кентрон (координата приблизит.)",
+    date:"анонс март 2026",
+    kind:"plan",
+    lat:40.1925, lng:44.5075,
+    site:"https://banksnews.am/102860/"
+  },
+  {
+    n:"Парк Влюблённых",
+    desc:"Существующий парк на Баграмяна с детской площадкой — прямо в коридоре Барекамутюн→центр, у метро «Маршал Баграмян»",
+    addr:"просп. Маршала Баграмяна (Погосян-парки)",
+    date:"существует (реконстр. 2007)",
+    kind:"exist",
+    lat:40.1903, lng:44.5095,
+    site:"https://www.armeniadiscovery.com/hy/articles/lovers-park"
+  },
+  {
+    n:"Парк Туманяна (Тумо-парк)",
+    desc:"Существующий парк у Киевского моста: футбол/баскетбол поля + детские площадки, 7 га",
+    addr:"край Разданского ущелья у Киевского моста, Аджапняк",
+    date:"существует (реконстр. 2009–2010)",
+    kind:"exist",
+    lat:40.1880, lng:44.4960,
+    site:"https://visityerevan.am/places/details/286/ru/"
+  }
+];
+
+const map = L.map('map').setView([40.178,44.512], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  maxZoom:19, attribution:'© OpenStreetMap'
+}).addTo(map);
+
+// опорная точка — метро/собор «Зоравар Андраник»
+L.circleMarker([40.17194,44.51694],{radius:6,color:"#888",fillColor:"#bbb",fillOpacity:.9})
+ .addTo(map).bindPopup("<div class='pop'><b>Метро «Зоравар Андраник» / Собор Григория Просветителя</b><br>ориентир — рядом площадка №1</div>");
+
+// опорная точка — пл. Барекамутюн (Дружбы), Арабкир
+L.circleMarker([40.1979,44.4929],{radius:6,color:"#555",fillColor:"#9b59b6",fillOpacity:.95})
+ .addTo(map).bindPopup("<div class='pop'><b>Пл. Барекамутюн (Дружбы) / метро</b><br>Арабкир — ваш ориентир. Большие тематические — вниз по Баграмяна в центр.</div>");
+
+const markers=[];
+sites.forEach((s,i)=>{
+  const color = s.status==="open" ? "#2ecc71" : "#f1c40f";
+  const m=L.marker([s.lat,s.lng]).addTo(map);
+  const g=`https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}`;
+  const y=`https://yandex.ru/maps/?pt=${s.lng},${s.lat}&z=17&l=map`;
+  m.bindPopup(`<div class='pop'><b>${s.n}</b><br>
+    <i>${s.theme}</i><br>
+    <b>Парк:</b> ${s.park}<br>
+    <b>Где:</b> ${s.addr}<br>
+    <b>Размер:</b> ${s.size} · <b>Возраст:</b> ${s.age}<br>
+    <b>Открытие:</b> ${s.date}<br>
+    <a href='${g}' target='_blank'>📍 Google Maps</a> · <a href='${y}' target='_blank'>Яндекс</a> · <a href='${s.site}' target='_blank'>Сайт</a>
+  </div>`);
+  markers.push(m);
+
+  const card=document.createElement('div');
+  card.className='card';
+  card.innerHTML=`<h3>${s.n}<span class='badge ${s.status}'>${s.status==='open'?'открыта':'в стройке'}</span></h3>
+    <div class='meta'><b>${s.park}</b><br>${s.addr}<br>
+    <b>${s.size}</b> · ${s.age} · откр. ${s.date}</div>
+    <div class='lk' style='margin-top:6px'>
+      <a href='https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}' target='_blank'>Google Maps</a>
+      <a href='${s.site}' target='_blank'>Сайт</a>
+    </div>`;
+  card.onclick=()=>{ map.flyTo([s.lat,s.lng],17); markers[i].openPopup(); };
+  document.getElementById('list').appendChild(card);
+});
+
+// дворовые — оранжевые кружки
+yards.forEach((s,i)=>{
+  const cm=L.circleMarker([s.lat,s.lng],{radius:7,color:"#e67e22",fillColor:"#f39c12",fillOpacity:.9,weight:2}).addTo(map);
+  const g=`https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}`;
+  cm.bindPopup(`<div class='pop'><b>🏠 ${s.n}</b><br>
+    <i>${s.desc}</i><br>
+    <b>Где:</b> ${s.addr}<br>
+    <b>Открытие:</b> ${s.date}<br>
+    <a href='${g}' target='_blank'>📍 Google Maps</a> · <a href='${s.site}' target='_blank'>Источник</a>
+  </div>`);
+  markers.push(cm);
+
+  const card=document.createElement('div');
+  card.className='card';
+  card.style.borderColor='#5a4413';
+  card.innerHTML=`<h3>🏠 ${s.n}</h3>
+    <div class='meta'>${s.addr}<br>${s.desc}<br><b>откр. ${s.date}</b></div>
+    <div class='lk' style='margin-top:6px'>
+      <a href='https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}' target='_blank'>Google Maps</a>
+      <a href='${s.site}' target='_blank'>Источник</a>
+    </div>`;
+  card.onclick=()=>{ map.flyTo([s.lat,s.lng],17); cm.openPopup(); };
+  document.getElementById('yards').appendChild(card);
+});
+
+// Арабкир / коридор — синие маркеры (новые ярче, существующие бледнее)
+arabkir.forEach((s)=>{
+  const fill = s.kind==="new" ? "#2e86de" : (s.kind==="plan" ? "#74b9ff" : "#a4b0be");
+  const cm=L.circleMarker([s.lat,s.lng],{radius:7,color:"#1b4f72",fillColor:fill,fillOpacity:.95,weight:2}).addTo(map);
+  const g=`https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}`;
+  const tag = s.kind==="new"?"🆕 новая":(s.kind==="plan"?"🛠 в работе":"♻️ существует");
+  cm.bindPopup(`<div class='pop'><b>${s.n}</b> <small>(${tag})</small><br>
+    <i>${s.desc}</i><br>
+    <b>Где:</b> ${s.addr}<br>
+    <b>Статус/дата:</b> ${s.date}<br>
+    <a href='${g}' target='_blank'>📍 Google Maps</a> · <a href='${s.site}' target='_blank'>Источник</a>
+  </div>`);
+  markers.push(cm);
+
+  const card=document.createElement('div');
+  card.className='card';
+  card.style.borderColor='#1b3a52';
+  card.innerHTML=`<h3>${s.kind==="new"?"🆕":(s.kind==="plan"?"🛠":"♻️")} ${s.n}</h3>
+    <div class='meta'>${s.addr}<br>${s.desc}<br><b>${s.date}</b></div>
+    <div class='lk' style='margin-top:6px'>
+      <a href='https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}' target='_blank'>Google Maps</a>
+      <a href='${s.site}' target='_blank'>Источник</a>
+    </div>`;
+  card.onclick=()=>{ map.flyTo([s.lat,s.lng],16); cm.openPopup(); };
+  document.getElementById('arabkir').appendChild(card);
+});
+
+// === Слой OSM: ВСЕ размеченные площадки города (точные координаты, парсинг Overpass/OSM) ===
+const osmLayer = L.layerGroup();
+let nNew=0, nOld=0;
+(window.osmPlaygrounds || []).forEach(p=>{
+  const g=`https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
+  const nm = p.name ? `<b>${p.name}</b><br>` : "<b>Площадка</b><br>";
+  if(p.new) nNew++; else nOld++;
+  const st = p.new
+    ? {radius:5, color:"#0a7d3a", fillColor:"#39d353", weight:1.5}   // новые (≤4 лет) — ярко-зелёные
+    : {radius:3, color:"#6b7d84", fillColor:"#aebfc4", weight:1};    // старые — бледно-серые
+  const tag = p.new ? "🟢 новая (на карте с "+p.ts+")" : "⚪ старая (правка "+p.ts+")";
+  L.circleMarker([p.lat,p.lng],{...st,fillOpacity:.85})
+   .bindPopup(`<div class='pop'>${nm}<small>${tag} · координата OSM</small><br><a href='${g}' target='_blank'>📍 Google Maps</a></div>`)
+   .addTo(osmLayer);
+});
+osmLayer.addTo(map);
+
+// === Детская ж/д в Разданском ущелье («поезд по ущелью») ===
+// Линия ущелья (приближённый маршрут вдоль реки Раздан)
+const gorge = L.polyline([
+  [40.17950,44.49870],[40.18250,44.49930],[40.18560,44.49980],
+  [40.18655,44.50046],[40.18950,44.50120],[40.19250,44.50230],[40.19550,44.50330]
+],{color:"#e74c3c",weight:4,opacity:.75,dashArray:"7 6"}).addTo(map);
+gorge.bindPopup("<div class='pop'><b>🚂 Ереванская детская ж/д — Разданское ущелье</b><br>Узкоколейка 2,1 км вдоль реки Раздан. Линия — приближённый маршрут.</div>");
+L.marker([40.186554,44.50046]).addTo(map)
+ .bindPopup(`<div class='pop'><b>🚂 Детская ж/д «Айреник»</b> (Разданское ущелье)<br>
+   Узкоколейка 750 мм, 2,1 км, открытые вагончики, тоннель 45 м. Открыта 1937.<br>
+   <b>«Расписание» (историческое):</b> тёплый сезон (май/июнь–сент/окт), ежедневно ~11:00–12:00 до вечера, отправление <b>по мере заполнения</b>, билет ~100–400 драм.<br>
+   <b>⚠️ Статус:</b> в июле 2024 ж/д <b>официально ликвидирована</b> — регулярных поездов нет; работа в 2026 не подтверждена. Парк/территория/старый паровоз доступны, вход свободный.<br>
+   Спуск — через тоннели под Главпочтамтом (просп. Маштоца).<br>
+   <a href='https://www.google.com/maps/search/?api=1&query=40.186554,44.50046' target='_blank'>📍 Google Maps</a> ·
+   <a href='https://ru.wikipedia.org/wiki/Ереванская_детская_железная_дорога' target='_blank'>вики</a>
+ </div>`);
+
+// === ⭐ ТОП: большие и прикольные ===
+const topPicks = [
+  {n:"⭐ «Кармрахайт» — крупнейшая (2000 м²)", why:"8-м рыба-форель, 27 м сеток-волн, галька, вечерняя подсветка. 0–12. Кольцевой парк у м. Зоравар Андраник.", lat:40.17225, lng:44.51540},
+  {n:"⭐ «Армянские изобретатели» — вертикальная", why:"Башня 6 м + самая высокая горка 7 м, физика/астрономия/инженерия. 3–12. Сквер Манушяна, центр.", lat:40.18336, lng:44.50752},
+  {n:"⭐ «Вишапагорг» — ковёр-дракон", why:"Тотем-страж, тактильная, очень красивая. Малыши 0–7. Сквер Хачкаров у пл. Республики.", lat:40.17545, lng:44.50790},
+  {n:"⭐ «Безоарский козёл» (строится)", why:">1500 м², про природу Армении. Парк Возрождения, Нор-Норк.", lat:40.1965, lng:44.5460},
+  {n:"⭐ Yerevan Park — крытый 2-этажный", why:"Лабиринт, батуты. Платный, на жару/дождь. Монте Мелконян 31 (координата приблизит.).", lat:40.15185, lng:44.48400},
+  {n:"⭐ Play City — крытый центр", why:"Развлекательный игровой центр (из OSM). Нор-Норк.", lat:40.218759, lng:44.557872}
+];
+const starIcon = L.divIcon({className:'', iconSize:[30,30], iconAnchor:[15,15],
+  html:'<div style="font-size:24px;line-height:1;filter:drop-shadow(0 0 3px #000);text-align:center">⭐</div>'});
+topPicks.forEach(s=>{
+  const g=`https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}`;
+  L.marker([s.lat,s.lng],{icon:starIcon,zIndexOffset:1000}).addTo(map)
+   .bindPopup(`<div class='pop'><b>${s.n}</b><br>${s.why}<br><a href='${g}' target='_blank'>📍 Google Maps</a></div>`);
+});
+
+const grp=L.featureGroup(markers);
+map.fitBounds(grp.getBounds().pad(0.2));
+
+// Тоггл слоя OSM-точек
+const tc = L.control({position:'topright'});
+tc.onAdd = function(){
+  const d = L.DomUtil.create('div');
+  d.style.cssText='background:#fff;padding:6px 9px;border-radius:6px;font:12px system-ui;box-shadow:0 1px 4px rgba(0,0,0,.3)';
+  d.innerHTML = `<label style="cursor:pointer"><input id="osmtog" type="checkbox" checked> Площадки OSM:</label>
+    <div style="margin-top:3px;font-size:11px;line-height:1.4">
+      <span style="color:#1a9c43">●</span> ${nNew} новых (≤4 лет)<br>
+      <span style="color:#9bb0b5">●</span> ${nOld} старых</div>`;
+  L.DomEvent.disableClickPropagation(d);
+  return d;
+};
+tc.addTo(map);
+document.getElementById('osmtog').addEventListener('change',e=>{
+  if(e.target.checked) osmLayer.addTo(map); else map.removeLayer(osmLayer);
+});
+</script>
+</body>
+</html>
