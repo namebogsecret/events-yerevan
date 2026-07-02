@@ -44,9 +44,9 @@
   .meta b{color:var(--mut);font-weight:500}
   .desc{font-size:13px;color:#6B6354}
   .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
-  .tag{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--card2);color:var(--acc2);border:1px solid var(--line)}
+  .tag{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--card2);color:var(--acc2);border:1px solid var(--line)}
   .tag.who{color:#6E4A19;background:#EEE2C9}
-  .conf{font-size:11px;padding:2px 7px;border-radius:6px}
+  .conf{font-size:12px;padding:2px 7px;border-radius:6px}
   .conf.high{background:#E4EFE6;color:#3E7D55} .conf.medium{background:#F3E8CE;color:#B07A1E}
   .conf.low{background:#F3E1D9;color:#B0472F}
   .btns{display:flex;gap:8px;margin-top:auto;flex-wrap:wrap}
@@ -59,6 +59,26 @@
   .leaflet-popup-content{font-size:13px;line-height:1.4}
   .leaflet-popup-content a{color:#6E4A19}
   footer{color:var(--mut);font-size:12px;text-align:center;padding:24px}
+  .btn-more{font:600 15px "Manrope",sans-serif;background:var(--acc);color:#FCF8F0;border:none;
+    border-radius:10px;padding:12px 26px;min-height:44px;cursor:pointer}
+  .btn-more:hover{filter:brightness(1.08)}
+  .filters-toggle{display:none}
+  .cta-tutor{background:var(--acc2)!important;color:#FCF8F0!important;font-weight:700!important}
+  @media(max-width:640px){
+    .filters{background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none;padding:8px 0}
+    .filters-toggle{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;
+      min-height:44px;padding:11px 15px;border:1px solid var(--line);border-radius:10px;
+      background:var(--card);font:600 15px "Manrope",sans-serif;color:var(--txt);cursor:pointer}
+    .filters-toggle .chev{transition:transform .2s}
+    .filters.open .filters-toggle .chev{transform:rotate(180deg)}
+    .filters-body{max-height:0;overflow:hidden;transition:max-height .22s ease}
+    .filters.open .filters-body{max-height:72vh;overflow-y:auto;margin-top:10px;padding-right:2px}
+    .pill{min-height:44px;display:inline-flex;align-items:center;padding:9px 14px;font-size:14px}
+    #search{min-height:44px;font-size:16px;flex:1 1 100%}
+    a.btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+    .grid{grid-template-columns:1fr}
+    .tag,.conf{font-size:12px}
+  }
 </style>
 <meta name="description" content="Афиша Еревана: 209 событий — концерты, фестивали, детские программы, традиции. Фильтры по аудитории, возрасту, месяцу и теме; список и карта.">
 <meta property="og:title" content="События в Ереване 2026">
@@ -75,6 +95,7 @@
     <h1>События в Ереване — лето, осень и новогодние ярмарки 2026</h1>
     <div class="sub">2026-05-28 → 2026-12-31 · Ереван · обновлено 2026-06-11 · всего событий: 209</div>
     <div style="margin:10px 0 14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+      <a href="https://tutor.podlevskikh.com" style="background:#6E4A19;color:#FCF8F0;font-weight:700;font-size:13px;padding:7px 13px;border-radius:8px;text-decoration:none">📘 Репетитор физики и математики</a>
       <a href="guides/index.html" style="background:#9A6A28;color:#FCF8F0;font-weight:700;font-size:13px;padding:7px 13px;border-radius:8px;text-decoration:none">Гайды по Еревану</a>
       <a href="guides/pereezd-v-erevan-rus.html" style="border:1px solid #D8CDB6;color:#6B6354;font-size:13px;padding:7px 13px;border-radius:8px;text-decoration:none">Переезд в Ереван</a>
       <a href="guides/chto-delat-v-erevane.html" style="border:1px solid #D8CDB6;color:#6B6354;font-size:13px;padding:7px 13px;border-radius:8px;text-decoration:none">Что делать в городе</a>
@@ -85,6 +106,8 @@
 </header>
 <div class="wrap">
   <div class="filters">
+    <button class="filters-toggle" id="filtersToggle" aria-expanded="false"><span id="filtersLabel">🔎 Фильтры</span><span class="chev">▾</span></button>
+    <div class="filters-body">
     <div class="frow">
       <span class="flabel">Для кого (можно выбрать несколько)</span>
       <span class="pill person" data-who="vladimir">👨‍🏫 Я (Владимир)</span>
@@ -150,6 +173,7 @@
         <span class="pill" id="viewMap">🗺️ Карта</span>
       </span>
     </div>
+    </div>
   </div>
   <div class="count" id="count"></div>
   <div id="list"></div>
@@ -178,8 +202,9 @@ const CAT_LABEL = {science:"наука",tech:"IT/AI",workshop:"мастер-кл
   festival:"фестиваль",food:"еда/вино",music:"музыка",nightlife:"вечер/лайв",film:"кино",arts:"искусство",
   tradition:"праздник",sport:"спорт",wellness:"спа/термы",free:"бесплатно"};
 
+const PAGE = 24;
 const state = {who:new Set(), cat:new Set(), months:new Set(), age:null,
-               free:false, matchAll:false, seasonOnly:false, q:"", view:"list"};
+               free:false, matchAll:false, seasonOnly:false, q:"", view:"list", shown:PAGE};
 
 function effectiveAudience(e){
   const a = new Set(e.audience);
@@ -233,7 +258,7 @@ function card(e){
     <div class="meta"><b>Возраст:</b> ${e.age||"—"}</div>
     <div class="meta"><b>Цена:</b> <span class="${free?'free':''}">${e.price||"уточнить"}</span></div>
     <div class="desc">${e.description}</div>
-    <div class="tags">${who}${cats}<span class="conf ${e.confidence}">${e.confidence==='high'?'дата ✓':e.confidence==='medium'?'дата ~':'дата ?'}</span></div>
+    <div class="tags">${who}${cats}<span class="conf ${e.confidence}">${e.confidence==='high'?'дата ✓':e.confidence==='medium'?'дата ~':'дата уточняется'}</span></div>
     <div class="meta"><b>Организатор:</b> ${e.organizer||"—"}</div>
     ${e.phone?`<div class="meta"><b>Телефон:</b> <a href="tel:${e.phone.replace(/[^+\d]/g,'')}" style="color:var(--acc2)">${e.phone}</a></div>`:""}
     ${e.email?`<div class="meta"><b>Почта:</b> <a href="mailto:${e.email}" style="color:var(--acc2)">${e.email}</a></div>`:""}
@@ -246,23 +271,34 @@ function card(e){
 
 // ---------- LIST ----------
 function renderList(list){
+  // Полный набор фильтруется в matches(); здесь рендерим порциями по PAGE (клиентская пагинация),
+  // чтобы при первой загрузке в DOM попадала небольшая часть карточек.
   const dated=list.filter(e=>!e.recurring).sort((a,b)=>a.date_start.localeCompare(b.date_start));
   const ever=list.filter(e=>e.recurring).sort((a,b)=>a.title_ru.localeCompare(b.title_ru,'ru'));
-  let html="", cm=null;
-  if(dated.length){
-    dated.forEach(e=>{
+  const ordered=dated.concat(ever);
+  const shown=Math.min(state.shown, ordered.length);
+  let html="", cm=null, inEver=false, gridOpen=false;
+  for(let i=0;i<shown;i++){
+    const e=ordered[i];
+    if(!e.recurring){
       const m=+e.date_start.slice(5,7);
-      if(m!==cm){ if(cm!==null) html+="</div>"; cm=m; html+=`<div class="month-h">${MONTHS[m]} 2026</div><div class="grid">`; }
-      html+=card(e);
-    });
-    html+="</div>";
+      if(m!==cm){ if(gridOpen) html+="</div>"; cm=m; html+=`<div class="month-h">${MONTHS[m]} 2026</div><div class="grid">`; gridOpen=true; }
+    } else if(!inEver){
+      if(gridOpen) html+="</div>"; inEver=true;
+      html+=`<div class="month-h">🎡 Работают весь сезон — приходи когда удобно</div><div class="grid">`; gridOpen=true;
+    }
+    html+=card(ordered[i]);
   }
-  if(ever.length){
-    html+=`<div class="month-h">🎡 Работают весь сезон — приходи когда удобно</div><div class="grid">`;
-    ever.forEach(e=>html+=card(e)); html+="</div>";
+  if(gridOpen) html+="</div>";
+  if(!ordered.length) html=`<p style="color:var(--mut);padding:30px 0">Ничего не найдено — ослабьте фильтры.</p>`;
+  const remaining=ordered.length-shown;
+  if(remaining>0){
+    const step=Math.min(PAGE, remaining);
+    html+=`<div style="text-align:center;margin:22px 0"><button id="showMore" class="btn-more">Показать ещё (${step} из ${remaining})</button></div>`;
   }
-  if(!list.length) html=`<p style="color:var(--mut);padding:30px 0">Ничего не найдено — ослабьте фильтры.</p>`;
   document.getElementById("list").innerHTML=html;
+  const sm=document.getElementById("showMore");
+  if(sm) sm.onclick=function(){ state.shown+=PAGE; paint(); };
 }
 
 // ---------- MAP ----------
@@ -303,15 +339,23 @@ function renderMap(list){
   setTimeout(()=>{ map.invalidateSize(); if(pts.length) map.fitBounds(pts,{padding:[40,40],maxZoom:14}); },60);
 }
 
-function render(){
-  const list=EV.filter(matches);
-  document.getElementById("count").textContent=`Показано: ${list.length} из ${EV.length}`+
+function activeCount(){
+  return state.who.size+state.cat.size+state.months.size+(state.age!=null?1:0)+
+    (state.free?1:0)+(state.matchAll?1:0)+(state.seasonOnly?1:0)+(state.q?1:0);
+}
+function paint(){
+  const list=EV.filter(matches);   // фильтрация всегда по полному набору EV
+  document.getElementById("count").textContent=`Найдено: ${list.length} из ${EV.length}`+
     (state.view==="map"?" · на карте":"");
+  const n=activeCount(), fl=document.getElementById("filtersLabel");
+  if(fl) fl.textContent=n?`🔎 Фильтры · ${n}`:"🔎 Фильтры";
   const onMap=state.view==="map";
   document.getElementById("list").style.display=onMap?"none":"block";
   document.getElementById("map").style.display=onMap?"block":"none";
   if(onMap) renderMap(list); else renderList(list);
 }
+// Смена любого фильтра/вида — сбрасываем пагинацию к первой порции; «Показать ещё» вызывает paint() напрямую.
+function render(){ state.shown=PAGE; paint(); }
 
 // ---------- controls ----------
 function toggle(el,set,key){
@@ -340,6 +384,10 @@ document.getElementById("reset").onclick=function(){
   state.free=false;state.matchAll=false;state.seasonOnly=false;state.q="";
   document.querySelectorAll(".pill.on").forEach(p=>{ if(p.id!=="viewList") p.classList.remove("on"); });
   document.getElementById("search").value="";render();
+};
+document.getElementById("filtersToggle").onclick=function(){
+  const f=document.querySelector(".filters"); const open=f.classList.toggle("open");
+  this.setAttribute("aria-expanded", open?"true":"false");
 };
 render();
 </script>
