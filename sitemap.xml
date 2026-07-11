@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://events.podlevskikh.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://events.podlevskikh.com/guides/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://events.podlevskikh.com/guides/chto-delat-v-erevane.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://events.podlevskikh.com/guides/pereezd-v-erevan-rus.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://events.podlevskikh.com/guides/zhilyo-i-rayony-erevana.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://events.podlevskikh.com/guides/shkoly-i-deti-v-erevane.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://events.podlevskikh.com/detskie-ploshchadki.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://events.podlevskikh.com/yaponiya-v-erevane.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://events.podlevskikh.com/</loc><lastmod>2026-07-11</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://events.podlevskikh.com/guides/</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://events.podlevskikh.com/guides/chto-delat-v-erevane.html</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://events.podlevskikh.com/guides/pereezd-v-erevan-rus.html</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://events.podlevskikh.com/guides/zhilyo-i-rayony-erevana.html</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://events.podlevskikh.com/guides/shkoly-i-deti-v-erevane.html</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://events.podlevskikh.com/detskie-ploshchadki.html</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://events.podlevskikh.com/yaponiya-v-erevane.html</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>
