@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Япония в Ереване — карта японских мест (2026)</title>
+<meta name="description" content="Все места Еревана, связанные с Японией: посольство, центры японского языка, японский сад, аниме, рамен и суши, додзё, магазины. Интерактивная карта.">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+  html,body{margin:0;height:100%;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  #wrap{display:flex;height:100%;position:relative}
+  #side{width:350px;max-width:44vw;overflow:auto;background:#160f1c;color:#efe8f4;padding:16px 18px;box-sizing:border-box;transition:width .25s ease,padding .25s ease,opacity .2s ease}
+  #map{flex:1}
+  h1{font-size:18px;margin:0 0 4px}
+  h1 .jp{color:#ff5c74;font-weight:400}
+  .sub{font-size:12px;color:#b39fc7;margin:0 0 12px;line-height:1.45}
+  .cat-h{font-size:13px;margin:16px 0 6px;display:flex;align-items:center;gap:7px}
+  .cat-h .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .card{background:#211530;border:1px solid #38254e;border-radius:10px;padding:9px 11px;margin:0 0 8px;cursor:pointer;transition:.15s}
+  .card:hover{border-color:#ff5c74;background:#2a1b3d}
+  .card h3{margin:0 0 3px;font-size:13.5px}
+  .badge{display:inline-block;font-size:9.5px;padding:2px 7px;border-radius:20px;margin-left:6px;vertical-align:middle}
+  .b-ver{background:#0f3d24;color:#5ee08a}
+  .b-lik{background:#3d330f;color:#f0c65e}
+  .b-unc{background:#3d1a0f;color:#f0975e}
+  .meta{font-size:11px;color:#b39fc7;line-height:1.5;margin:3px 0 0}
+  .meta b{color:#ddd0ea}
+  .lk a{color:#ff8fa0;font-size:11px;text-decoration:none;margin-right:10px}
+  .lk a:hover{text-decoration:underline}
+  .pop b{font-size:13px}
+  .pop{font-size:12px;line-height:1.5}
+  .pop a{color:#d6265c}
+  .foot{font-size:10px;color:#7d6b91;margin-top:12px;line-height:1.5}
+  #wrap.collapsed #side{width:0;min-width:0;padding-left:0;padding-right:0;opacity:0;overflow:hidden}
+  #sidetoggle{position:absolute;top:10px;left:362px;z-index:1500;background:#d6265c;color:#fff;border:1px solid #a01c45;border-radius:8px;padding:7px 12px;cursor:pointer;font:700 13px system-ui;box-shadow:0 2px 8px rgba(0,0,0,.5);transition:left .25s ease;user-select:none}
+  #sidetoggle:hover{background:#b81f4e}
+  #wrap.collapsed #sidetoggle{left:8px}
+  .backlink{display:inline-block;margin:0 0 10px;font-size:11.5px;color:#ff8fa0;text-decoration:none;border:1px solid #38254e;border-radius:8px;padding:4px 9px}
+  .backlink:hover{border-color:#ff5c74}
+  @media(max-width:600px){#sidetoggle{left:auto;right:10px}#wrap.collapsed #sidetoggle{left:8px;right:auto}}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <button id="sidetoggle" onclick="toggleSide()">⟨ Скрыть</button>
+  <div id="side">
+    <a class="backlink" href="index.html">← События в Ереване</a>
+    <a class="backlink" href="detskie-ploshchadki.html">🛝 Детские площадки</a>
+    <h1>🇯🇵 Япония в Ереване <span class="jp">日本</span></h1>
+    <p class="sub">Все места города, связанные с Японией: язык и культура, настоящая японская еда, додзё, магазины, японский сад. Кликните карточку — карта подлетит к метке. Галочки справа вверху включают/выключают категории.</p>
+    <div id="cats"></div>
+    <p class="foot" id="footnote"><b>Точность:</b> координаты проверены по Google Maps/OSM; помеченные «≈» — привязка к зданию/кварталу, уточняйте кнопкой Google Maps. Статусы: <span style="color:#5ee08a">подтверждено</span> = 2+ источника, работает в 2025–26; <span style="color:#f0c65e">вероятно</span> = один источник. Собрано: июль 2026.</p>
+  </div>
+  <div id="map"></div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* КАТЕГОРИИ */
+const CATS = {
+  official: {name:"Официальное и сообщества", emoji:"🏛", color:"#e74c3c"},
+  culture:  {name:"Язык и культура",          emoji:"🎌", color:"#9b59b6"},
+  food:     {name:"Японская еда",             emoji:"🍜", color:"#e67e22"},
+  shop:     {name:"Магазины и аниме",         emoji:"🛍", color:"#ff5c9d"},
+  sport:    {name:"Будо и игры",              emoji:"🥋", color:"#27ae60"},
+  place:    {name:"Места и сады",             emoji:"🌸", color:"#f78fb3"},
+  event:    {name:"Фестивали (площадки)",     emoji:"🎪", color:"#f1c40f"}
+};
+
+/* ДАННЫЕ — собрано 2026-07-11 (веб-разведка + база событий Еревана) */
+const PLACES = [
+  // 🏛 официальное
+  {n:"Посольство Японии в Армении", jp:"在アルメニア日本国大使館", cat:"official", status:"verified",
+   desc:"Действующее дипломатическое представительство: визы, культурные и экономические программы. Спонсирует IROHA, «Хикари» и спортивные федерации.",
+   addr:"ул. Бабаяна 23/4, Арабкир", lat:40.1984111, lng:44.5159182,
+   site:"https://www.am.emb-japan.go.jp/", phone:"+374 11 523010"},
+  {n:"Представительство JICA в Армении", cat:"official", status:"verified",
+   desc:"Офис Японского агентства международного сотрудничества: гранты и техническая помощь Армении.",
+   addr:"ул. Налбандяна 25/14, кв. 4, Кентрон", lat:40.1817347, lng:44.5199197,
+   site:"https://www.jica.go.jp/english/overseas/armenia/", phone:"+374 10 568805"},
+
+  // 🎌 язык и культура
+  {n:"Центр «Ироха» (IROHA)", jp:"いろは", cat:"culture", status:"verified",
+   desc:"Армяно-японский центр обмена: курсы японского всех уровней (JLPT), каллиграфия, ханами, оригами, хинамацури. Активен, 11 лет работы. Пн–Пт 14:00–20:30, Сб 12:00–20:30.",
+   addr:"ул. Бузанда 1, Кентрон", lat:40.1796670, lng:44.5119850,
+   site:"https://irohacenter.com", ig:"https://www.facebook.com/irohacenter/", phone:"+374 93 268168"},
+  {n:"Центр «Хикари»", jp:"ひかり", cat:"culture", status:"verified",
+   desc:"Армяно-японский культурный центр (с 2005): курсы японского, оригами, икебана, чайная церемония, суми-э; ежегодный фестиваль японского кино и «Фонарики мира».",
+   addr:"ул. Сарьяна 33, Кентрон", lat:40.1809076, lng:44.5053478,
+   site:"http://japanarmenia.com/the-armenian-japanese-hikari-scientific-center/", phone:"+374 10 533713"},
+  {n:"Центр японского языка и культуры РАУ", cat:"culture", status:"verified",
+   desc:"Центр при Российско-Армянском университете (поддержка посольства Японии); бакалавриат и магистратура «Японоведение».",
+   addr:"ул. Овсепа Эмина 123", lat:40.2106137, lng:44.5035482,
+   site:"https://sociopolitics.rau.am/page/tsentr-yaponskogo-yazyka", phone:"+374 12 775775"},
+  {n:"Японский язык в Университете Брюсова", cat:"culture", status:"verified",
+   desc:"Японский с 2010 г.; с 2024 — отдельная программа «Межкультурная коммуникация (японский язык)». Japan Foundation направляет преподавателя-японца; ежегодный конкурс речи.",
+   addr:"ул. Туманяна 42, Кентрон", lat:40.1872707, lng:44.5110751,
+   site:"https://brusov.am/ru/faculty/fakul_tet_mezhkul_turnoi_kommunikatcii_i_politologii/"},
+  {n:"Факультет востоковедения ЕГУ", cat:"culture", status:"likely",
+   desc:"Японский язык в ЕГУ — наряду с китайским, арабским, персидским и другими восточными языками.",
+   addr:"ул. Алека Манукяна 1", lat:40.1816998, lng:44.5265118,
+   site:"https://www.ysu.am/ru/faculty/70"},
+
+  // 🌸 места и сады
+  {n:"Японский сад в Парке влюблённых", cat:"place", status:"verified",
+   desc:"Первый и единственный японский сад Армении: озеро, водопад, мостики; реконструкция 2005–2008 архитектора Пьера Рамбаха (фонд Boghossian). Бесплатно, 07:00–02:00.",
+   addr:"пр. Маршала Баграмяна 21, у метро «Маршал Баграмян»", lat:40.1919293, lng:44.5050072,
+   site:"https://visityerevan.am/places/details/268/ru/"},
+  {n:"Аллея сакур у Национального собрания", cat:"place", status:"verified",
+   desc:"5 сакур из Японии, высажены в 2015 к 100-летию Геноцида армян и 70-летию Хиросимы и Нагасаки. Цветут в конце марта — начале апреля.",
+   addr:"пр. Маршала Баграмяна, у здания НС РА", lat:40.1912303, lng:44.5114390, approx:true},
+  {n:"Японская секция Ботанического сада", cat:"place", status:"likely",
+   desc:"Один из 4 участков дендрария — деревья и кустарники Японии (в т.ч. японская софора).",
+   addr:"ул. Ачаряна 1, Аван", lat:40.2112, lng:44.5565},
+
+  // 🍜 еда
+  {n:"Tokyooo — кайтен-суши", jp:"東京ooo", cat:"food", status:"verified",
+   desc:"Первый в Армении ресторан с конвейерной подачей суши; управляет японец Хироки Тачиири, японский шеф. TripAdvisor Travelers' Choice 2024; сюда ходит посол Японии.",
+   addr:"ул. Налбандяна 37, Кентрон", lat:40.1829503, lng:44.5219251,
+   site:"https://tokyooo.am/"},
+  {n:"Kagayaki", jp:"かがやき", cat:"food", status:"verified",
+   desc:"Аутентичный японский ресторан группы «Еремян» (открыт апрель 2025): роллы, сашими, нигири от приглашённых шефов. У Каскада.",
+   addr:"ул. Московян 29/4, у Каскада", lat:40.1879470, lng:44.5156341,
+   site:"https://www.yeremyanprojects.com/ru/restaurants/kagayaki", phone:"+374 10 606090"},
+  {n:"Ramen Ten — раменная", cat:"food", status:"verified",
+   desc:"Специализация — рамен и азиатская лапша; по отзывам — лучший рамен города.",
+   addr:"ул. Абовяна 2/5, Кентрон", lat:40.1814269, lng:44.5158360, approx:true,
+   site:"https://ru.ramenten.am/", phone:"+374 95 223311"},
+  {n:"Sushi Mushi", cat:"food", status:"verified",
+   desc:"Старейшая суши-сеть Еревана (несколько филиалов); массовый формат, не аутентика — но узнаваемая марка и доставка.",
+   addr:"пр. Аршакуняца 51 (главный; есть другие филиалы)", lat:40.1575165, lng:44.5022762,
+   site:"https://sushimushi.am/", phone:"+374 77 223838"},
+  {n:"Wasabi", cat:"food", status:"verified",
+   desc:"Сеть суши-ресторанов (4 филиала) в центре: суши, рамен, wok. Казуальный формат.",
+   addr:"ул. Абовяна 1/3, Кентрон", lat:40.1799090, lng:44.5138959, approx:true},
+  {n:"Sushi Zen", cat:"food", status:"likely",
+   desc:"Суши-бар в центре (2 филиала): японское меню, поке, чай на вынос.",
+   addr:"пр. Маштоца 18/2, Кентрон", lat:40.1802123, lng:44.5072215},
+  {n:"Mah-chah — матча-кафе", cat:"food", status:"likely",
+   desc:"Кафе, специализирующееся на матча (японский порошковый чай) и бранчах.",
+   addr:"ул. Анрапетутян 58", lat:40.1772488, lng:44.5177052,
+   site:"https://mahchah.iva.am/"},
+  {n:"Gotcha — боба и матча", cat:"food", status:"likely",
+   desc:"Сеть с азиатскими боба-чаями, матча-латте и моти-мороженым; первая точка — в Каскаде (2020), сейчас несколько по городу.",
+   addr:"Северный проспект 8/2 (один из филиалов)", lat:40.1825171, lng:44.5144398},
+
+  // 🛍 магазины
+  {n:"Anime Otaku — аниме-магазин", cat:"shop", status:"likely",
+   desc:"Магазин аниме/манга-товаров: фигурки, мерч. Цокольный этаж.",
+   addr:"ул. Спендиаряна 5, Кентрон", lat:40.1810, lng:44.5188, approx:true},
+  {n:"Daigo Armenia — японская косметика", cat:"shop", status:"likely",
+   desc:"Эксклюзивный дистрибьютор японской B&S Corporation: органическая косметика и БАДы. Онлайн + аптеки-партнёры, шоурума нет.",
+   addr:"Ереван (интернет-магазин)", lat:40.1776, lng:44.5132, approx:true,
+   site:"https://daigo.am/"},
+
+  // 🥋 будо и игры
+  {n:"Федерация Айкидо Айкикай Армении", cat:"sport", status:"verified",
+   desc:"С 2004 г., президент Армен Аветисян (5-й дан); признана Всемирной федерацией айкидо и посольством Японии. Додзё — в спортзале ЕГУ.",
+   addr:"спортзал ЕГУ, ул. Алека Манукяна 1", lat:40.1820, lng:44.5270, approx:true,
+   site:"https://aikikai.am/"},
+  {n:"Национальная федерация каратэ (WKF)", cat:"sport", status:"verified",
+   desc:"С 1988 г.; представитель Всемирной федерации каратэ в Армении, 29 клубов-членов.",
+   addr:"ул. Езника Кохбаци 69, Кентрон", lat:40.1840406, lng:44.5135930,
+   site:"https://karate.am/"},
+  {n:"Федерация Киокушин каратэ", cat:"sport", status:"verified",
+   desc:"С 2005 г., президент Андраник Акопян (5-й дан); дважды принимала чемпионат Европы (2012, 2018). Залы во всех районах.",
+   addr:"пр. Цовакал Исакова 42 (один из залов)", lat:40.1594, lng:44.4390, approx:true,
+   site:"https://www.kyokushin.am/"},
+  {n:"Федерация дзюдо Армении", cat:"sport", status:"verified",
+   desc:"Регулирующий орган дзюдо под эгидой Национального олимпийского комитета.",
+   addr:"ул. Абовяна 16, Кентрон", lat:40.1813726, lng:44.5165919,
+   site:"http://judo.am/", phone:"+374 10 545161"},
+  {n:"Федерация кэндо Армении", cat:"sport", status:"unclear",
+   desc:"Действует под эгидой НОК; посол Японии (5-й дан кэндо) выступал на фестивале «Будо». Точный адрес додзё не подтверждён — координата условная.",
+   addr:"Ереван (адрес зала уточнять у федерации)", lat:40.1768, lng:44.5120, approx:true},
+  {n:"Клуб Го — Armenian Go Community", jp:"囲碁", cat:"sport", status:"likely",
+   desc:"Воскресные встречи по японской игре Го: каждое вс 19:00 в чайной, 3000 AMD (чай + обучение новичков). Адрес встречи — в чате @igoarmenia.",
+   addr:"чайная в центре (анонсы в Telegram)", lat:40.1785, lng:44.5105, approx:true,
+   site:"https://t.me/igoarmenia"},
+
+  // 🎪 фестивали (площадки)
+  {n:"«РеАнимания» — фестиваль анимации", cat:"event", status:"verified",
+   desc:"Крупнейший анимационный фестиваль Южного Кавказа (с 2008): показы, мастер-классы, комиксы. Ежегодно в октябре (2026: 10–17 окт), основная площадка — Дом кино.",
+   addr:"Дом кино, ул. Вардананца 18", lat:40.1757986, lng:44.5196366,
+   site:"https://www.reanimania.com/"},
+  {n:"Фестиваль японского кино", cat:"event", status:"verified",
+   desc:"Ежегодный фестиваль японского кино («Хикари» + посольство Японии) в кинотеатре «Москва».",
+   addr:"к/т «Москва», ул. Абовяна 18", lat:40.1818076, lng:44.5173627},
+  {n:"Ханами — праздник сакуры", jp:"花見", cat:"event", status:"verified",
+   desc:"Ежегодное любование цветущей сакурой у Аллеи сакур (конец марта — начало апреля) с журавликами-оригами; организуют «Хикари» и союз «Арумения-Ниппон».",
+   addr:"Аллея сакур у НС РА, пр. Баграмяна", lat:40.1914, lng:44.5117, approx:true}
+];
+
+const map = L.map('map').setView([40.183,44.513], 14);
+function toggleSide(){
+  const w=document.getElementById('wrap'), b=document.getElementById('sidetoggle');
+  const collapsed=w.classList.toggle('collapsed');
+  b.textContent=collapsed?'☰ Меню':'⟨ Скрыть';
+  setTimeout(()=>map.invalidateSize(),280);
+}
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+
+const layers={}, counts={};
+Object.keys(CATS).forEach(k=>{layers[k]=L.layerGroup().addTo(map);counts[k]=0;});
+const allMarkers=[];
+
+const badge = s => s==="verified" ? "<span class='badge b-ver'>подтверждено</span>"
+             : s==="likely" ? "<span class='badge b-lik'>вероятно</span>"
+             : "<span class='badge b-unc'>не подтверждено</span>";
+
+PLACES.forEach(p=>{
+  const c=CATS[p.cat]||CATS.place;
+  counts[p.cat]=(counts[p.cat]||0)+1;
+  const g=`https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
+  const y=`https://yandex.ru/maps/?pt=${p.lng},${p.lat}&z=17&l=map`;
+  const links=[`<a href='${g}' target='_blank'>📍 Google Maps</a>`,`<a href='${y}' target='_blank'>Яндекс</a>`];
+  if(p.site) links.push(`<a href='${p.site}' target='_blank'>Сайт</a>`);
+  if(p.ig) links.push(`<a href='${p.ig}' target='_blank'>Instagram</a>`);
+  const m=L.circleMarker([p.lat,p.lng],{radius:9,color:"#1a1024",fillColor:c.color,fillOpacity:.95,weight:2});
+  m.bindPopup(`<div class='pop'><b>${c.emoji} ${p.n}</b>${p.jp?` <span style='color:#888'>${p.jp}</span>`:""}<br>
+    <i>${p.desc}</i><br>
+    <b>Где:</b> ${p.addr}${p.approx?" <small>(≈)</small>":""}<br>
+    ${p.phone?`<b>Тел:</b> ${p.phone}<br>`:""}
+    ${links.join(" · ")}
+  </div>`);
+  m.addTo(layers[p.cat]);
+  allMarkers.push(m);
+
+  let sec=document.getElementById('sec-'+p.cat);
+  if(!sec){
+    const h=document.createElement('div');
+    h.className='cat-h';
+    h.innerHTML=`<span class='dot' style='background:${c.color}'></span>${c.emoji} ${c.name}`;
+    document.getElementById('cats').appendChild(h);
+    sec=document.createElement('div'); sec.id='sec-'+p.cat;
+    document.getElementById('cats').appendChild(sec);
+  }
+  const card=document.createElement('div');
+  card.className='card';
+  card.style.borderLeft=`3px solid ${c.color}`;
+  card.innerHTML=`<h3>${p.n}${badge(p.status)}</h3>
+    <div class='meta'>${p.addr}${p.approx?" ≈":""}<br>${p.desc}${p.phone?`<br><b>${p.phone}</b>`:""}</div>
+    <div class='lk' style='margin-top:5px'>
+      <a href='${g}' target='_blank'>Google Maps</a>
+      ${p.site?`<a href='${p.site}' target='_blank'>Сайт</a>`:""}
+      ${p.ig?`<a href='${p.ig}' target='_blank'>IG</a>`:""}
+    </div>`;
+  card.onclick=()=>{ map.flyTo([p.lat,p.lng],17); m.openPopup(); };
+  sec.appendChild(card);
+});
+
+if(allMarkers.length){
+  const grp=L.featureGroup(allMarkers);
+  map.fitBounds(grp.getBounds().pad(0.15));
+}
+
+/* Тоггл категорий */
+const tc=L.control({position:'topright'});
+tc.onAdd=function(){
+  const d=L.DomUtil.create('div');
+  d.style.cssText='background:#fff;padding:7px 10px;border-radius:6px;font:12px system-ui;box-shadow:0 1px 4px rgba(0,0,0,.3);max-width:190px';
+  d.innerHTML=Object.keys(CATS).filter(k=>counts[k]).map(k=>
+    `<label style="cursor:pointer;display:block;margin:2px 0"><input type="checkbox" class="cattog" data-cat="${k}" checked>
+     <span style="color:${CATS[k].color}">●</span> ${CATS[k].emoji} ${CATS[k].name} (${counts[k]})</label>`).join('');
+  L.DomEvent.disableClickPropagation(d);
+  return d;
+};
+tc.addTo(map);
+document.querySelectorAll('.cattog').forEach(cb=>cb.addEventListener('change',e=>{
+  const k=e.target.dataset.cat;
+  if(e.target.checked) layers[k].addTo(map); else map.removeLayer(layers[k]);
+}));
+</script>
+</body>
+</html>
