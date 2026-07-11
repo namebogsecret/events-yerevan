@@ -44,9 +44,7 @@
 <div id="wrap">
   <button id="sidetoggle" onclick="toggleSide()">⟨ Скрыть</button>
   <div id="side">
-    <a class="backlink" href="index.html">← События в Ереване</a>
-    <a class="backlink" href="yaponiya-v-erevane.html">🇯🇵 Япония</a>
-    <a class="backlink" href="detskie-ploshchadki.html">🛝 Площадки</a>
+    <div id="mapsnav"></div>
     <h1>🇺🇸🇬🇧 Английский в Ереване</h1>
     <p class="sub">Американо-британские места города и — главное — где реально <b>говорить по-английски вживую</b>: клубы, встречи, пабы с носителями. Бейдж <span class="badge b-spk">🗣 живая речь</span> = там разговаривают, а не просто «связано с США/UK». Кликните карточку — карта подлетит. Галочки справа вверху — фильтр категорий.</p>
     <div id="cats"></div>
@@ -271,5 +269,6 @@ document.querySelectorAll('.cattog').forEach(cb=>cb.addEventListener('change',e=
   if(e.target.checked) layers[k].addTo(map); else map.removeLayer(layers[k]);
 }));
 </script>
+<script src="maps-nav.js?v=1"></script>
 </body>
 </html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Школы Еревана — карта: международные, русские, частные, государственные (2026)</title>
+<meta name="description" content="Интерактивная карта школ Еревана: международные (IB, Cambridge, американские, французские), русскоязычные, армянские частные и сильные государственные. Языки обучения, цены 2025–26, контакты. Русский / English / Հայերեն.">
+<link rel="canonical" href="https://events.podlevskikh.com/shkoly-erevana.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏫%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="vendor/leaflet.css"/>
+<style>
+  html,body{margin:0;height:100%;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  #wrap{display:flex;height:100%;position:relative}
+  #side{width:360px;max-width:46vw;overflow:auto;background:#141a2a;color:#e8ecf4;padding:16px 18px;box-sizing:border-box;transition:width .25s ease,padding .25s ease,opacity .2s ease}
+  #map{flex:1}
+  h1{font-size:18px;margin:0 0 4px}
+  .sub{font-size:12px;color:#9fb0cc;margin:0 0 12px;line-height:1.45}
+  .cat-h{font-size:13px;margin:16px 0 6px;display:flex;align-items:center;gap:7px}
+  .cat-h .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .card{background:#1b2338;border:1px solid #2c3a58;border-radius:10px;padding:9px 11px;margin:0 0 8px;cursor:pointer;transition:.15s}
+  .card:hover{border-color:#8e44ad;background:#222c46}
+  .card h3{margin:0 0 3px;font-size:13.5px}
+  .badge{display:inline-block;font-size:9.5px;padding:2px 7px;border-radius:20px;margin-left:6px;vertical-align:middle}
+  .b-ver{background:#0f3d24;color:#5ee08a}
+  .b-lik{background:#3d330f;color:#f0c65e}
+  .chip{display:inline-block;font-size:9.5px;padding:1px 6px;border-radius:5px;background:#26314e;color:#a9c1ef;margin:2px 3px 0 0}
+  .chip.fee{background:#3a2b14;color:#f0c65e}
+  .meta{font-size:11px;color:#9fb0cc;line-height:1.5;margin:3px 0 0}
+  .meta b{color:#d5deef}
+  .lk a{color:#9fb9ff;font-size:11px;text-decoration:none;margin-right:10px}
+  .lk a:hover{text-decoration:underline}
+  .pop{font-size:12px;line-height:1.5}
+  .pop b{font-size:13px}
+  .pop a{color:#6E4A19}
+  .foot{font-size:10px;color:#6f7f9e;margin-top:12px;line-height:1.5}
+  #wrap.collapsed #side{width:0;min-width:0;padding-left:0;padding-right:0;opacity:0;overflow:hidden}
+  #sidetoggle{position:absolute;top:10px;left:372px;z-index:1500;background:#8e44ad;color:#fff;border:1px solid #6a3282;border-radius:8px;padding:7px 12px;cursor:pointer;font:700 13px system-ui;box-shadow:0 2px 8px rgba(0,0,0,.5);transition:left .25s ease;user-select:none}
+  #sidetoggle:hover{background:#7a3a95}
+  #wrap.collapsed #sidetoggle{left:8px}
+  .langsw{display:flex;gap:4px;margin:0 0 10px}
+  .langsw button{flex:1;font:700 11px system-ui;padding:5px 0;border-radius:7px;border:1px solid #2c3a58;background:#1b2338;color:#9fb0cc;cursor:pointer}
+  .langsw button.on{background:#8e44ad;border-color:#8e44ad;color:#fff}
+  @media(max-width:600px){#sidetoggle{left:auto;right:10px}#wrap.collapsed #sidetoggle{left:8px;right:auto}}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <button id="sidetoggle" onclick="toggleSide()">⟨</button>
+  <div id="side">
+    <div id="mapsnav"></div>
+    <div class="langsw" id="langsw"></div>
+    <h1 id="t_h1"></h1>
+    <p class="sub" id="t_sub"></p>
+    <div id="cats"></div>
+    <p class="foot" id="t_foot"></p>
+  </div>
+  <div id="map"></div>
+</div>
+<script src="vendor/leaflet.js"></script>
+<script src="osm_schools.js?v=1"></script>
+<script src="data_shkoly.js?v=1"></script>
+<script>
+/* ЯЗЫК: localStorage('maps_lang') — общий для всех карт сети */
+let LANG = localStorage.getItem('maps_lang') || 'ru';
+if(!['ru','en','hy'].includes(LANG)) LANG='ru';
+window.MAPS_LANG = LANG;
+
+const UI = {
+ ru:{h1:'🏫 Школы Еревана',
+     sub:'Международные (IB, Cambridge, американская, французская программы), русскоязычные, армянские частные и сильные государственные школы — с языками обучения, ценами 2025–26 и контактами. Кликните карточку — карта подлетит. Галочки справа вверху — фильтр категорий. Серые точки — все остальные ~290 школ города (OSM).',
+     foot:'<b>Точность:</b> координаты сверены по OSM/Google Maps; «≈» — привязка к кварталу. Статусы: <span style="color:#5ee08a">подтверждено</span> = 2+ источника, работает в 2025–26; <span style="color:#f0c65e">вероятно</span> = один источник. Цены — за 2025–26 уч. год, уточняйте в школе. Собрано: июль 2026.',
+     osm:'Все школы города (OSM)', gm:'Google Maps', site:'Сайт', tel:'Тел', fee:'Цена', grades:'Классы', langs:'Языки', note:'Нюанс'},
+ en:{h1:'🏫 Yerevan Schools',
+     sub:'International (IB, Cambridge, American, French), Russian-language, Armenian private and top state schools — with languages of instruction, 2025–26 fees and contacts. Click a card to fly to the pin. Checkboxes (top-right) filter categories. Grey dots = all other ~290 city schools (OSM).',
+     foot:'<b>Accuracy:</b> coordinates checked against OSM/Google Maps; "≈" = block-level. Status: <span style="color:#5ee08a">verified</span> = 2+ sources, operating in 2025–26; <span style="color:#f0c65e">likely</span> = single source. Fees are for 2025–26, confirm with the school. Compiled: July 2026.',
+     osm:'All city schools (OSM)', gm:'Google Maps', site:'Website', tel:'Tel', fee:'Fee', grades:'Grades', langs:'Languages', note:'Note'},
+ hy:{h1:'🏫 Երևանի դպրոցներ',
+     sub:'Միջազգային (IB, Cambridge, ամերիկյան, ֆրանսիական), ռուսալեզու, հայկական մասնավոր և ուժեղ պետական դպրոցներ՝ ուսուցման լեզուներով, 2025–26 գներով և կոնտակտներով։ Սեղմեք քարտին՝ քարտեզը կմոտենա։ Մոխրագույն կետերը՝ քաղաքի մյուս ~290 դպրոցները (OSM)։',
+     foot:'<b>Ճշգրտություն.</b> կոորդինատները ստուգված են OSM/Google Maps-ով; «≈» = թաղամասի մակարդակ։ <span style="color:#5ee08a">Հաստատված</span> = 2+ աղբյուր; <span style="color:#f0c65e">հավանական</span> = մեկ աղբյուր։ Գները՝ 2025–26 ուստարվա համար։ Հավաքված է՝ 2026 հուլիս։',
+     osm:'Քաղաքի բոլոր դպրոցները (OSM)', gm:'Google Maps', site:'Կայք', tel:'Հեռ', fee:'Գին', grades:'Դասարաններ', langs:'Լեզուներ', note:'Նշում'}
+};
+
+const CATS = {
+ intl:   {ru:'Международные школы', en:'International schools', hy:'Միջազգային դպրոցներ', emoji:'🌍', color:'#e74c3c'},
+ russian:{ru:'Русскоязычные',        en:'Russian-language',      hy:'Ռուսալեզու',            emoji:'🇷🇺', color:'#2e86de'},
+ private:{ru:'Армянские частные',    en:'Armenian private',      hy:'Հայկական մասնավոր',     emoji:'🎓', color:'#8e44ad'},
+ state_special:{ru:'Сильные государственные', en:'Top state schools', hy:'Ուժեղ պետական', emoji:'🏛', color:'#27ae60'}
+};
+
+const T = UI[LANG];
+const PLACES = window.SCHOOLS_CURATED || [];
+
+/* ===== общий движок (идентичен detskie-sady-erevana.html) ===== */
+function pick(o, base){ return o[base+'_'+LANG] || o[base+'_ru'] || o[base+'_en'] || ''; }
+function osmName(p){ return (LANG==='hy'&&p.nh)||(LANG==='ru'&&p.nr)||(LANG==='en'&&p.ne)||p.n||p.ne||p.nr||p.nh||''; }
+
+document.getElementById('t_h1').textContent = T.h1;
+document.getElementById('t_sub').innerHTML = T.sub;
+document.getElementById('t_foot').innerHTML = T.foot;
+document.title = {ru:'Школы Еревана — карта (2026)', en:'Yerevan Schools — map (2026)', hy:'Երևանի դպրոցներ — քարտեզ (2026)'}[LANG];
+
+const sw = document.getElementById('langsw');
+[['ru','Рус'],['en','Eng'],['hy','Հայ']].forEach(([l,lb])=>{
+  const b=document.createElement('button'); b.textContent=lb;
+  if(l===LANG) b.className='on';
+  b.onclick=()=>{ localStorage.setItem('maps_lang',l); location.reload(); };
+  sw.appendChild(b);
+});
+
+const map = L.map('map').setView([40.187,44.515],12.4);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+
+function gmLink(p){ return `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`; }
+function popupHtml(p){
+  const nm = pick(p,'name'), addr = (LANG==='ru'?p.addr_ru:p.addr_en)||p.addr_ru||'';
+  let h = `<div class="pop"><b>${nm}</b><br>${pick(p,'desc')}`;
+  if(addr) h += `<br>📍 ${addr}${p.approx?' ≈':''}`;
+  if(p.fee_usd) h += `<br>💰 ${p.fee_usd}`;
+  if(p.grades) h += ` · 🎒 ${p.grades}`;
+  if(p.langs&&p.langs.length) h += `<br>🗣 ${p.langs.map(x=>x.toUpperCase()).join(' / ')}`;
+  if(LANG==='ru'&&p.note_ru) h += `<br>⚠️ ${p.note_ru}`;
+  h += `<br><a href="${gmLink(p)}" target="_blank">📍 ${T.gm}</a>`;
+  if(p.site) h += ` · <a href="${p.site}" target="_blank">${T.site}</a>`;
+  if(p.phone) h += ` · <a href="tel:${p.phone.replace(/[^+\d]/g,'')}">${p.phone}</a>`;
+  return h+'</div>';
+}
+
+const groups = {}, markers = {};
+Object.keys(CATS).forEach(k=>groups[k]=L.layerGroup().addTo(map));
+PLACES.forEach((p,i)=>{
+  const c = CATS[p.cat]; if(!c) return;
+  const m = L.circleMarker([p.lat,p.lng],{radius:8,color:'#0e1420',weight:1.5,fillColor:c.color,fillOpacity:.95})
+    .bindPopup(popupHtml(p),{maxWidth:320});
+  m.addTo(groups[p.cat]); markers[i]=m;
+});
+
+/* фоновый OSM-слой: серые точки, без дублей рядом с курируемыми (<160 м) */
+function far(lat,lng){ return PLACES.every(p=> (Math.abs(p.lat-lat)*111000)**2 + (Math.abs(p.lng-lng)*85000)**2 > 160*160 ); }
+const osmLayer = L.layerGroup();
+(window.osmSchools||[]).forEach(p=>{
+  if(!far(p.lat,p.lng)) return;
+  const nm = osmName(p);
+  let h = `<div class="pop"><b>${nm||'—'}</b>`;
+  if(p.a) h+=`<br>📍 ${p.a}`;
+  h += `<br><a href="${gmLink(p)}" target="_blank">📍 ${T.gm}</a>`;
+  if(p.s) h+=` · <a href="${p.s}" target="_blank">${T.site}</a>`;
+  if(p.p) h+=` · <a href="tel:${p.p.replace(/[^+\d]/g,'')}">${p.p}</a>`;
+  L.circleMarker([p.lat,p.lng],{radius:4,color:'#0e1420',weight:1,fillColor:'#8a97ad',fillOpacity:.7})
+    .bindPopup(h+'</div>',{maxWidth:280}).addTo(osmLayer);
+});
+osmLayer.addTo(map);
+
+/* контрол категорий */
+const overlays = {};
+Object.entries(CATS).forEach(([k,c])=>{
+  overlays[`<span style="color:${c.color}">●</span> ${c.emoji} ${c[LANG]}`]=groups[k];
+});
+overlays[`<span style="color:#8a97ad">●</span> ${T.osm}`]=osmLayer;
+L.control.layers(null, overlays, {collapsed:false, position:'topright'}).addTo(map);
+
+/* сайдбар: карточки по категориям */
+const catsEl = document.getElementById('cats');
+Object.entries(CATS).forEach(([k,c])=>{
+  const items = PLACES.map((p,i)=>[p,i]).filter(([p])=>p.cat===k);
+  if(!items.length) return;
+  const h = document.createElement('div');
+  h.className='cat-h';
+  h.innerHTML=`<span class="dot" style="background:${c.color}"></span><b>${c.emoji} ${c[LANG]}</b> <span style="color:#6f7f9e">(${items.length})</span>`;
+  catsEl.appendChild(h);
+  items.forEach(([p,i])=>{
+    const d=document.createElement('div'); d.className='card';
+    const badge = p.status==='verified' ? `<span class="badge b-ver">✓</span>` : `<span class="badge b-lik">?</span>`;
+    let chips='';
+    if(p.langs&&p.langs.length) chips += p.langs.map(x=>`<span class="chip">${x.toUpperCase()}</span>`).join('');
+    if(p.curriculum) chips += `<span class="chip">${p.curriculum}</span>`;
+    if(p.grades) chips += `<span class="chip">${p.grades}</span>`;
+    if(p.fee_usd) chips += `<span class="chip fee">${p.fee_usd}</span>`;
+    let lk = `<a href="${gmLink(p)}" target="_blank">📍 ${T.gm}</a>`;
+    if(p.site) lk += `<a href="${p.site}" target="_blank">${T.site}</a>`;
+    if(p.phone) lk += `<a href="tel:${p.phone.replace(/[^+\d]/g,'')}">${p.phone}</a>`;
+    d.innerHTML = `<h3>${pick(p,'name')}${badge}</h3>
+      <div>${chips}</div>
+      <p class="meta">${pick(p,'desc')}${LANG==='ru'&&p.note_ru?`<br><b>⚠️</b> ${p.note_ru}`:''}</p>
+      <p class="meta">📍 ${(LANG==='ru'?p.addr_ru:p.addr_en)||p.addr_ru||''}${p.approx?' ≈':''}</p>
+      <div class="lk">${lk}</div>`;
+    d.onclick=e=>{ if(e.target.tagName==='A') return; map.flyTo([p.lat,p.lng],16,{duration:.8}); markers[i].openPopup(); };
+    catsEl.appendChild(d);
+  });
+});
+
+function toggleSide(){
+  const w=document.getElementById('wrap'); w.classList.toggle('collapsed');
+  document.getElementById('sidetoggle').textContent = w.classList.contains('collapsed')?'⟩':'⟨';
+  setTimeout(()=>map.invalidateSize(),300);
+}
+</script>
+<script src="maps-nav.js?v=1"></script>
+</body>
+</html>

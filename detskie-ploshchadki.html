@@ -45,7 +45,7 @@
 <div id="wrap">
   <button id="sidetoggle" onclick="toggleSide()">⟨ Скрыть</button>
   <div id="side">
-    <div style="margin:-4px 0 12px;font-size:12px"><a href="./" style="color:#7ea2ff;text-decoration:none">← События в Ереване</a> · <a href="https://podlevskikh.com" style="color:#6b7da0;text-decoration:none">podlevskikh.com</a></div>
+    <div id="mapsnav"></div>
     <h1>Новые детские площадки Еревана</h1>
     <p class="sub">Тематические (Керон) + дворовые/мини-поля по районам, 2024–2026. Кликните карточку — карта подлетит к метке.<br><b>⭐ звёзды</b> на карте = самые большие и прикольные (топ-выбор).</p>
     <div style="background:#16213c;border:1px solid #2e86de;border-radius:10px;padding:8px 10px;margin:0 0 14px">
@@ -383,5 +383,6 @@ document.getElementById('osmtog').addEventListener('change',e=>{
   if(e.target.checked) osmLayer.addTo(map); else map.removeLayer(osmLayer);
 });
 </script>
+<script src="maps-nav.js?v=1"></script>
 </body>
 </html>

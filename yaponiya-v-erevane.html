@@ -44,9 +44,7 @@
 <div id="wrap">
   <button id="sidetoggle" onclick="toggleSide()">⟨ Скрыть</button>
   <div id="side">
-    <a class="backlink" href="index.html">← События в Ереване</a>
-    <a class="backlink" href="detskie-ploshchadki.html">🛝 Детские площадки</a>
-    <a class="backlink" href="angliyskiy-v-erevane.html">🇺🇸🇬🇧 Английский</a>
+    <div id="mapsnav"></div>
     <h1>🇯🇵 Япония в Ереване <span class="jp">日本</span></h1>
     <p class="sub">Все места города, связанные с Японией: язык и культура, настоящая японская еда, додзё, магазины, японский сад — и отдельно <b style="color:#5ee08a">🗣 где реально говорить по-японски с носителями</b>. Кликните карточку — карта подлетит к метке. Галочки справа вверху включают/выключают категории.<br><br>📝 <b>JLPT</b> проводится в Ереване ежегодно в декабре (уровни N1–N5, с 2016 г.); заявки в сентябре через IROHA/«Хикари»/вузы: +374 93 268168.</p>
     <div id="cats"></div>
@@ -293,5 +291,6 @@ document.querySelectorAll('.cattog').forEach(cb=>cb.addEventListener('change',e=
   if(e.target.checked) layers[k].addTo(map); else map.removeLayer(layers[k]);
 }));
 </script>
+<script src="maps-nav.js?v=1"></script>
 </body>
 </html>
