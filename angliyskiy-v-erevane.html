@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Английский в Ереване — карта американо-британских мест и живой речи (2026)</title>
+<meta name="description" content="Где в Ереване говорить по-английски: разговорные клубы, Toastmasters, American Corner, AUA, экспатские пабы, книжные, кино в оригинале, посольства США и Великобритании. Интерактивная карта.">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+  html,body{margin:0;height:100%;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  #wrap{display:flex;height:100%;position:relative}
+  #side{width:350px;max-width:44vw;overflow:auto;background:#0d1526;color:#e9eef8;padding:16px 18px;box-sizing:border-box;transition:width .25s ease,padding .25s ease,opacity .2s ease}
+  #map{flex:1}
+  h1{font-size:18px;margin:0 0 4px}
+  .sub{font-size:12px;color:#9fb0cc;margin:0 0 12px;line-height:1.45}
+  .cat-h{font-size:13px;margin:16px 0 6px;display:flex;align-items:center;gap:7px}
+  .cat-h .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .card{background:#152036;border:1px solid #26375a;border-radius:10px;padding:9px 11px;margin:0 0 8px;cursor:pointer;transition:.15s}
+  .card:hover{border-color:#c8102e;background:#1a2743}
+  .card h3{margin:0 0 3px;font-size:13.5px}
+  .badge{display:inline-block;font-size:9.5px;padding:2px 7px;border-radius:20px;margin-left:6px;vertical-align:middle}
+  .b-ver{background:#0f3d24;color:#5ee08a}
+  .b-lik{background:#3d330f;color:#f0c65e}
+  .b-unc{background:#3d1a0f;color:#f0975e}
+  .b-spk{background:#12314d;color:#6fc3ff;font-weight:700}
+  .meta{font-size:11px;color:#9fb0cc;line-height:1.5;margin:3px 0 0}
+  .meta b{color:#cdd9ef}
+  .lk a{color:#7ea2ff;font-size:11px;text-decoration:none;margin-right:10px}
+  .lk a:hover{text-decoration:underline}
+  .pop b{font-size:13px}
+  .pop{font-size:12px;line-height:1.5}
+  .pop a{color:#1a5cff}
+  .foot{font-size:10px;color:#6b7da0;margin-top:12px;line-height:1.5}
+  #wrap.collapsed #side{width:0;min-width:0;padding-left:0;padding-right:0;opacity:0;overflow:hidden}
+  #sidetoggle{position:absolute;top:10px;left:362px;z-index:1500;background:#1a3c8f;color:#fff;border:1px solid #12295f;border-radius:8px;padding:7px 12px;cursor:pointer;font:700 13px system-ui;box-shadow:0 2px 8px rgba(0,0,0,.5);transition:left .25s ease;user-select:none}
+  #sidetoggle:hover{background:#152f70}
+  #wrap.collapsed #sidetoggle{left:8px}
+  .backlink{display:inline-block;margin:0 0 10px;font-size:11.5px;color:#7ea2ff;text-decoration:none;border:1px solid #26375a;border-radius:8px;padding:4px 9px}
+  .backlink:hover{border-color:#c8102e}
+  @media(max-width:600px){#sidetoggle{left:auto;right:10px}#wrap.collapsed #sidetoggle{left:8px;right:auto}}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <button id="sidetoggle" onclick="toggleSide()">⟨ Скрыть</button>
+  <div id="side">
+    <a class="backlink" href="index.html">← События в Ереване</a>
+    <a class="backlink" href="yaponiya-v-erevane.html">🇯🇵 Япония</a>
+    <a class="backlink" href="detskie-ploshchadki.html">🛝 Площадки</a>
+    <h1>🇺🇸🇬🇧 Английский в Ереване</h1>
+    <p class="sub">Американо-британские места города и — главное — где реально <b>говорить по-английски вживую</b>: клубы, встречи, пабы с носителями. Бейдж <span class="badge b-spk">🗣 живая речь</span> = там разговаривают, а не просто «связано с США/UK». Кликните карточку — карта подлетит. Галочки справа вверху — фильтр категорий.</p>
+    <div id="cats"></div>
+    <p class="foot"><b>Чего в Ереване НЕТ (проверено, июль 2026):</b> действующего клуба Toastmasters (в реестре toastmasters.org отсутствует) и отделения Mundo Lingo. Универсальный языковой обмен — Telegram <a href="https://t.me/polyglotsyerevan" style="color:#7ea2ff">Polyglots Yerevan</a> (~500 участников).<br><br><b>Точность:</b> координаты сверены по Nominatim/OSM; «≈» — привязка к зданию/кварталу. Статусы: <span style="color:#5ee08a">подтверждено</span> = 2+ источника, живо в 2025–26; <span style="color:#f0c65e">вероятно</span> = один источник. Собрано: июль 2026.</p>
+  </div>
+  <div id="map"></div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* КАТЕГОРИИ */
+const CATS = {
+  speaking: {name:"Разговорные клубы и встречи", emoji:"🗣", color:"#2ecc71"},
+  pub_cafe: {name:"Пабы и кафе экспатов",        emoji:"🍺", color:"#e67e22"},
+  education:{name:"Образование",                  emoji:"🎓", color:"#3498db"},
+  official: {name:"Посольства и официальное",     emoji:"🏛", color:"#c8102e"},
+  shop:     {name:"Книжные и магазины",           emoji:"📚", color:"#9b59b6"},
+  faith:    {name:"Англоязычные службы",          emoji:"⛪", color:"#1abc9c"},
+  event:    {name:"Кино, стендап, квизы",         emoji:"🎤", color:"#f1c40f"}
+};
+
+/* ДАННЫЕ — собрано 2026-07-12 (веб-разведка + база событий Еревана; координаты сверены Nominatim) */
+const PLACES = [
+  // 🗣 разговорные клубы и встречи
+  {n:"American Corner Yerevan", cat:"speaking", speak:true, status:"verified",
+   desc:"Главная точка живой практики: бесплатные English/debate/movie/book clubs с носителями, лекции посольства США. Активен в 2025–26.",
+   addr:"ул. Налбандяна 4/1 (библиотека им. Исаакяна)", lat:40.17806, lng:44.51639,
+   site:"http://yerevan.americancorners.am/", phone:"+374 10 561383"},
+  {n:"American Corner — TechnoLab", cat:"speaking", speak:true, status:"likely",
+   desc:"Второй филиал American Corner: STEM/IT-уклон, тоже английские клубы и события.",
+   addr:"ул. Киевян 1, Арабкир", lat:40.193327, lng:44.484937, approx:true,
+   site:"https://am.usembassy.gov/education/american-spaces/"},
+  {n:"IT Speaking Club", cat:"speaking", speak:true, status:"verified",
+   desc:"Активное сообщество 2025–26: бесплатные разговорные сессии по воскресеньям + тематические встречи (Wine & English). Площадка меняется (бывает Woods Center в Джрвеже и центр) — следить в Instagram/LinkedIn.",
+   addr:"площадка ротируется (метка условная, центр)", lat:40.1830, lng:44.5165, approx:true, when:"вс + ежемесячные ивенты",
+   ig:"https://www.instagram.com/it_speaking"},
+  {n:"English Club с носителем @ Team Time", cat:"speaking", speak:true, status:"verified",
+   desc:"Разговорный клуб с носителем в антикафе Team Time (почасовая оплата пространства, чай/кофе безлимит).",
+   addr:"ул. Закяна 10, 2 этаж", lat:40.176384, lng:44.504989, when:"вт 19:00–21:00 (сверять афишу)",
+   site:"https://teamtime.am/", phone:"+374 96 257555"},
+  {n:"English Club Reboot @ Beer Academy", cat:"speaking", speak:true, status:"likely",
+   desc:"Перезапущенный разговорный клуб английского; встречи в баре Beer Academy (первая новая — апрель 2026).",
+   addr:"ул. Московян 8", lat:40.188807, lng:44.518070, approx:true},
+  {n:"InterNations Yerevan", cat:"speaking", speak:true, status:"verified",
+   desc:"Крупнейшая экспат-сеть: ежемесячные официальные встречи (площадки ротируются — Kond House, Ad Libitum); общение на английском, много носителей.",
+   addr:"ротация площадок (метка — Kond House, ул. Лео 46)", lat:40.1806, lng:44.5027, approx:true, when:"ежемесячно",
+   site:"https://www.internations.org/yerevan-expats"},
+
+  // 🍺 пабы и кафе экспатов
+  {n:"26 Irish Pub", cat:"pub_cafe", speak:true, status:"verified",
+   desc:"Ирландский паб в центре: спорт-трансляции, live music, квизы (OmniQuiz); часть публики — экспаты.",
+   addr:"ул. Казара Парпеци 26 (цоколь)", lat:40.18586, lng:44.511607,
+   phone:"+374 77 822023"},
+  {n:"Freeman's Irish House", cat:"pub_cafe", speak:true, status:"verified",
+   desc:"Ирландский паб на Маштоца: англоговорящие бармены, live music, спорт.",
+   addr:"пр. Маштоца 37 (цоколь), у Оперы", lat:40.186017, lng:44.514116, approx:true},
+  {n:"Beatles Pub", cat:"pub_cafe", speak:true, status:"likely",
+   desc:"Паб в стиле The Beatles и классического рока; англоязычная атмосфера, популярен у иностранцев.",
+   addr:"ул. Пушкина 60", lat:40.185681, lng:44.508813,
+   site:"https://www.beatles.pub/"},
+  {n:"Tom Collins Pub", cat:"pub_cafe", speak:true, status:"likely",
+   desc:"Подвальный бар с ирландской атмосферой: виски, живой блюз/рок-н-ролл, международная публика 21+.",
+   addr:"ул. Пушкина 31", lat:40.182889, lng:44.512154,
+   site:"https://tomcollins.am/"},
+  {n:"Dargett Brewpub", cat:"pub_cafe", speak:true, status:"verified",
+   desc:"Первая крафтовая пивоварня Армении: интернациональная публика, экспаты и туристы, персонал говорит по-английски.",
+   addr:"ул. Арама 72", lat:40.183533, lng:44.508183,
+   site:"https://www.dargett.com/"},
+  {n:"Kond House", cat:"pub_cafe", speak:true, status:"verified",
+   desc:"Альт-культурный бар в историческом квартале Конд; принимает встречи InterNations (английский — язык общения).",
+   addr:"ул. Лео 46", lat:40.180241, lng:44.502935,
+   phone:"+374 91 013801"},
+  {n:"Ad Libitum Art Club", cat:"pub_cafe", speak:true, status:"verified",
+   desc:"Арт-бар, регулярная площадка встреч InterNations; творческая интернациональная атмосфера.",
+   addr:"ул. Сарьяна 36/1 (цоколь)", lat:40.180151, lng:44.504875},
+  {n:"Yankee Pub", cat:"pub_cafe", speak:false, status:"verified",
+   desc:"Американское название, но по факту — спортбар с латино-вечерами, ориентирован на местную публику. Не экспат-хаб.",
+   addr:"пр. Саят-Новы 3", lat:40.1854, lng:44.5168, approx:true,
+   phone:"+374 10 522511"},
+
+  // 🎓 образование
+  {n:"Американский университет Армении (AUA)", cat:"education", speak:true, status:"verified",
+   desc:"Кампус с преподаванием на английском; открытые публичные лекции, конференции и дискуссии на английском (часть — для внешней публики).",
+   addr:"пр. Маршала Баграмяна 40", lat:40.19329, lng:44.50452,
+   site:"https://aua.am/"},
+  {n:"QSI International School of Yerevan", cat:"education", speak:true, status:"verified",
+   desc:"Американская полностью англоязычная международная школа (3–18 лет, 20+ национальностей); англоязычное комьюнити родителей и персонала.",
+   addr:"Аштаракское шоссе 49/15, Ваанкни", lat:40.22333, lng:44.44750,
+   site:"https://yerevan.qsi.org/", phone:"+374 10 349130"},
+
+  // 🏛 посольства и официальное
+  {n:"Посольство США", cat:"official", speak:false, status:"verified",
+   desc:"Доступ по записи (визы/услуги); публичная ценность — сеть American Corners с бесплатными английскими клубами.",
+   addr:"ул. Америкян 1", lat:40.16500, lng:44.48167,
+   site:"https://am.usembassy.gov/"},
+  {n:"Посольство Великобритании", cat:"official", speak:false, status:"verified",
+   desc:"БЦ Kamar, 8 этаж; только по предварительной записи, публичных мероприятий нет.",
+   addr:"ул. Вазгена Саргсяна 2", lat:40.175812, lng:44.509992,
+   site:"https://www.gov.uk/world/organisations/british-embassy-yerevan"},
+  {n:"British Council Armenia", cat:"official", speak:true, status:"verified",
+   desc:"Действующий офис: IELTS-центр + образовательные программы. Не разговорный клуб, но консультации и экзамены — на английском.",
+   addr:"ул. Григора Лусаворича 9, БЦ Yerevan Plaza", lat:40.17361, lng:44.50556,
+   site:"https://www.britishcouncil.am/", phone:"+374 60 701515"},
+
+  // 📚 книжные и магазины
+  {n:"Common Ground Books & Spirits", cat:"shop", speak:true, status:"verified",
+   desc:"Книжный + винотека + арт-пространство: английская литература, лекции, кинопоказы; точка притяжения англоязычного комьюнити.",
+   addr:"ул. Туманяна 28/20 (внутренний двор)", lat:40.182408, lng:44.517871,
+   tg:"https://t.me/commonground_yerevan", phone:"+374 98 855990"},
+  {n:"Zangak (филиал на Абовяна)", cat:"shop", speak:false, status:"verified",
+   desc:"Крупная книжная сеть: раздел иностранной литературы, книжные клубы; персонал частично говорит по-английски.",
+   addr:"ул. Абовяна 7", lat:40.182240, lng:44.516372, approx:true,
+   site:"https://zangakbookstore.am/en"},
+  {n:"Bookinist (у Ераташардакан)", cat:"shop", speak:false, status:"likely",
+   desc:"Сеть книжных с иностранной/английской литературой.",
+   addr:"ул. Исаакяна 3", lat:40.187446, lng:44.521150, approx:true,
+   site:"https://www.books.am/en/addresses"},
+
+  // ⛪ англоязычные службы
+  {n:"Yerevan International Church", cat:"faith", speak:true, status:"likely",
+   desc:"Международная церковь, служба ориентирована на англоязычную общину (язык службы уточнить перед визитом).",
+   addr:"пр. Баграмяна 18", lat:40.191577, lng:44.511595, approx:true, when:"вс 16:00",
+   site:"http://yerevaninternationalchurch.com/"},
+
+  // 🎤 кино, стендап, квизы
+  {n:"Кинотеатр «Москва» — сеансы ENG", cat:"event", speak:true, status:"verified",
+   desc:"Регулярные показы фильмов в оригинале на английском с субтитрами (метка ENG в афише).",
+   addr:"ул. Абовяна 18", lat:40.1818076, lng:44.5173627,
+   site:"https://moscowcinema.com/en", phone:"+374 10 521210"},
+  {n:"KinoPark — голливудские новинки в оригинале", cat:"event", speak:true, status:"verified",
+   desc:"Сеть кинотеатров в ТЦ: многие новинки идут EN + армянские субтитры; проверять конкретный сеанс на сайте. Метка — Dalma Garden Mall.",
+   addr:"Dalma Garden Mall (также Yerevan Mall, Rio Mall)", lat:40.1565, lng:44.4673, approx:true,
+   site:"https://kinopark.am/en"},
+  {n:"Ari Stand-Up Club", cat:"event", speak:true, status:"likely",
+   desc:"Первая стендап-площадка Армении; шоу в основном на армянском/русском, но на open mic бывают номера на английском — сверять афишу.",
+   addr:"ул. Вардананца 18", lat:40.1758, lng:44.5196, approx:true},
+  {n:"Пабные квизы с английскими раундами", cat:"event", speak:true, status:"likely",
+   desc:"OmniQuiz, «Квиз, плиз!», «Что? Где? Когда?» в пабах и отелях; часть раундов на английском (особенно тематические в 26 Irish Pub). Метка — Ibis Yerevan Center.",
+   addr:"площадки меняются (26 Irish Pub, Ibis и др.)", lat:40.18465, lng:44.51455, approx:true}
+];
+
+const map = L.map('map').setView([40.183,44.513], 14);
+function toggleSide(){
+  const w=document.getElementById('wrap'), b=document.getElementById('sidetoggle');
+  const collapsed=w.classList.toggle('collapsed');
+  b.textContent=collapsed?'☰ Меню':'⟨ Скрыть';
+  setTimeout(()=>map.invalidateSize(),280);
+}
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+
+const layers={}, counts={};
+Object.keys(CATS).forEach(k=>{layers[k]=L.layerGroup().addTo(map);counts[k]=0;});
+const allMarkers=[];
+
+const badge = s => s==="verified" ? "<span class='badge b-ver'>подтверждено</span>"
+             : s==="likely" ? "<span class='badge b-lik'>вероятно</span>"
+             : "<span class='badge b-unc'>не подтверждено</span>";
+const spk = p => p.speak ? "<span class='badge b-spk'>🗣 живая речь</span>" : "";
+
+PLACES.forEach(p=>{
+  const c=CATS[p.cat]||CATS.event;
+  counts[p.cat]=(counts[p.cat]||0)+1;
+  const g=`https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
+  const y=`https://yandex.ru/maps/?pt=${p.lng},${p.lat}&z=17&l=map`;
+  const links=[`<a href='${g}' target='_blank'>📍 Google Maps</a>`,`<a href='${y}' target='_blank'>Яндекс</a>`];
+  if(p.site) links.push(`<a href='${p.site}' target='_blank'>Сайт</a>`);
+  if(p.tg) links.push(`<a href='${p.tg}' target='_blank'>Telegram</a>`);
+  if(p.ig) links.push(`<a href='${p.ig}' target='_blank'>Instagram</a>`);
+  const m=L.circleMarker([p.lat,p.lng],{radius:p.speak?10:8,color:"#0a1120",fillColor:c.color,fillOpacity:.95,weight:p.speak?3:2});
+  m.bindPopup(`<div class='pop'><b>${c.emoji} ${p.n}</b> ${p.speak?"🗣":""}<br>
+    <i>${p.desc}</i><br>
+    <b>Где:</b> ${p.addr}${p.approx?" <small>(≈)</small>":""}<br>
+    ${p.when?`<b>Когда:</b> ${p.when}<br>`:""}
+    ${p.phone?`<b>Тел:</b> ${p.phone}<br>`:""}
+    ${links.join(" · ")}
+  </div>`);
+  m.addTo(layers[p.cat]);
+  allMarkers.push(m);
+
+  let sec=document.getElementById('sec-'+p.cat);
+  if(!sec){
+    const h=document.createElement('div');
+    h.className='cat-h';
+    h.innerHTML=`<span class='dot' style='background:${c.color}'></span>${c.emoji} ${c.name}`;
+    document.getElementById('cats').appendChild(h);
+    sec=document.createElement('div'); sec.id='sec-'+p.cat;
+    document.getElementById('cats').appendChild(sec);
+  }
+  const card=document.createElement('div');
+  card.className='card';
+  card.style.borderLeft=`3px solid ${c.color}`;
+  card.innerHTML=`<h3>${p.n}${spk(p)}${badge(p.status)}</h3>
+    <div class='meta'>${p.addr}${p.approx?" ≈":""}${p.when?`<br><b>${p.when}</b>`:""}<br>${p.desc}${p.phone?`<br><b>${p.phone}</b>`:""}</div>
+    <div class='lk' style='margin-top:5px'>
+      <a href='${g}' target='_blank'>Google Maps</a>
+      ${p.site?`<a href='${p.site}' target='_blank'>Сайт</a>`:""}
+      ${p.tg?`<a href='${p.tg}' target='_blank'>TG</a>`:""}
+      ${p.ig?`<a href='${p.ig}' target='_blank'>IG</a>`:""}
+    </div>`;
+  card.onclick=()=>{ map.flyTo([p.lat,p.lng],17); m.openPopup(); };
+  sec.appendChild(card);
+});
+
+if(allMarkers.length){
+  const grp=L.featureGroup(allMarkers);
+  map.fitBounds(grp.getBounds().pad(0.15));
+}
+
+/* Тоггл категорий */
+const tc=L.control({position:'topright'});
+tc.onAdd=function(){
+  const d=L.DomUtil.create('div');
+  d.style.cssText='background:#fff;padding:7px 10px;border-radius:6px;font:12px system-ui;box-shadow:0 1px 4px rgba(0,0,0,.3);max-width:200px';
+  d.innerHTML=Object.keys(CATS).filter(k=>counts[k]).map(k=>
+    `<label style="cursor:pointer;display:block;margin:2px 0"><input type="checkbox" class="cattog" data-cat="${k}" checked>
+     <span style="color:${CATS[k].color}">●</span> ${CATS[k].emoji} ${CATS[k].name} (${counts[k]})</label>`).join('');
+  L.DomEvent.disableClickPropagation(d);
+  return d;
+};
+tc.addTo(map);
+document.querySelectorAll('.cattog').forEach(cb=>cb.addEventListener('change',e=>{
+  const k=e.target.dataset.cat;
+  if(e.target.checked) layers[k].addTo(map); else map.removeLayer(layers[k]);
+}));
+</script>
+</body>
+</html>
