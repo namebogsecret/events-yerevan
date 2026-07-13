@@ -6,7 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 git add -A
 if git diff --cached --quiet; then echo "Нечего деплоить."; exit 0; fi
-git -c user.email="armenia.mail.vladimir@gmail.com" -c user.name="Vladimir Podlevskikh" \
+git -c user.email="vladimir@podlevskikh.com" -c user.name="Vladimir Podlevskikh" \
   commit -qm "${1:-update events}"
 git push -q origin main
 echo "✓ Запушено → https://events.podlevskikh.com/ (~1 мин на пересборку)"
