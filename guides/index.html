@@ -109,4 +109,12 @@ document.addEventListener("click",function(ev){try{
   if(navigator.sendBeacon){navigator.sendBeacon(u)}else{(new Image()).src=u}
 }catch(e){}},true);
 </script>
+<!-- RR-SNIPPET: session-replay (клики / время на странице). Неблокирующий: после
+     window.load, ошибки проглатываются. В ШАБЛОНЕ генератора — вставка в готовый
+     html стиралась бы следующей сборкой. -->
+<script>window.addEventListener("load",function(){try{
+  var s=document.createElement("script");s.async=true;
+  s.src="https://stats.podlevskikh.com/rr/static/recorder.js";s.onerror=function(){};
+  document.body.appendChild(s);
+}catch(e){}});</script>
 </body></html>
